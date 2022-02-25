@@ -865,25 +865,16 @@
 		1D1F49D44A1380182EEE5828C77991FE /* VVNetwork */ = {
 			isa = PBXGroup;
 			children = (
-				5DD7805627C8B40400D26784 /* GroupRequest */,
-				E991EB7CDE117912CED3EF506C1B2D28 /* VVBackgroundSessionManager.h */,
-				251ED4BF9A3CE85A3027645016EA52B8 /* VVBackgroundSessionManager.m */,
-				5DD7805727C8B7E500D26784 /* BaseRequest */,
-				1A495098747CDDB7F5282E45D05BBD1C /* VVGroupRequest.h */,
-				D3AFBC049E22D24E8315334FAE72BECE /* VVGroupRequest.m */,
-				10DF52ABE6E75281EACEF2E1324A6906 /* VVMockManager.h */,
-				D4520694F32804B940832908577ED302 /* VVMockManager.m */,
-				C49CCCF17324557E4139518FF914FB4B /* VVMockURLProtocol.h */,
-				3664209F0C69D6397D603FCE3D153669 /* VVMockURLProtocol.m */,
 				4134855EAD5CE5284F8838557BC862B2 /* VVNetwork.h */,
 				12AD68DD87AD47B9C9B76CCFF281A5E0 /* VVNetworkAgent.h */,
 				EE6CA69D3A25AD2241C6944BD6529F40 /* VVNetworkAgent.m */,
 				7E8AA3D81C8C2491F95039C297977AFA /* VVNetworkConfig.h */,
 				6E24F2EA3EA3CAFCC52DFE489217CE3F /* VVNetworkConfig.m */,
-				8241539227E6DA954719CA69E0B0B959 /* VVNetworkResponse.h */,
-				C8C6CEFAB0ED35ED2BE2527336C23AA6 /* VVNetworkResponse.m */,
-				6271DEA185E1D7331D1EE186BC2AF4E7 /* VVNetworkTaskDelegate.h */,
-				F5E2CFAB68D32468010BF2A774C2AF1D /* VVNetworkTaskDelegate.m */,
+				5DD7805D27C8BCF400D26784 /* Mock */,
+				5DD7805C27C8BCEA00D26784 /* Background */,
+				5DD7805727C8B7E500D26784 /* BaseRequest */,
+				5DD7805627C8B40400D26784 /* GroupRequest */,
+				5DD7805E27C8BD0A00D26784 /* Response */,
 			);
 			name = VVNetwork;
 			path = KTNetwork/Classes/VVNetwork;
@@ -948,6 +939,8 @@
 			isa = PBXGroup;
 			children = (
 				D894E06D31B21AC3B3EFA10FB5A1D25E /* VVGroupChildRequestProtocol.h */,
+				1A495098747CDDB7F5282E45D05BBD1C /* VVGroupRequest.h */,
+				D3AFBC049E22D24E8315334FAE72BECE /* VVGroupRequest.m */,
 			);
 			path = GroupRequest;
 			sourceTree = "<group>";
@@ -960,6 +953,37 @@
 				9D80CF2126AD5C6F880E9A0B0157190A /* VVBaseRequest.m */,
 			);
 			path = BaseRequest;
+			sourceTree = "<group>";
+		};
+		5DD7805C27C8BCEA00D26784 /* Background */ = {
+			isa = PBXGroup;
+			children = (
+				E991EB7CDE117912CED3EF506C1B2D28 /* VVBackgroundSessionManager.h */,
+				251ED4BF9A3CE85A3027645016EA52B8 /* VVBackgroundSessionManager.m */,
+				6271DEA185E1D7331D1EE186BC2AF4E7 /* VVNetworkTaskDelegate.h */,
+				F5E2CFAB68D32468010BF2A774C2AF1D /* VVNetworkTaskDelegate.m */,
+			);
+			path = Background;
+			sourceTree = "<group>";
+		};
+		5DD7805D27C8BCF400D26784 /* Mock */ = {
+			isa = PBXGroup;
+			children = (
+				10DF52ABE6E75281EACEF2E1324A6906 /* VVMockManager.h */,
+				D4520694F32804B940832908577ED302 /* VVMockManager.m */,
+				C49CCCF17324557E4139518FF914FB4B /* VVMockURLProtocol.h */,
+				3664209F0C69D6397D603FCE3D153669 /* VVMockURLProtocol.m */,
+			);
+			path = Mock;
+			sourceTree = "<group>";
+		};
+		5DD7805E27C8BD0A00D26784 /* Response */ = {
+			isa = PBXGroup;
+			children = (
+				8241539227E6DA954719CA69E0B0B959 /* VVNetworkResponse.h */,
+				C8C6CEFAB0ED35ED2BE2527336C23AA6 /* VVNetworkResponse.m */,
+			);
+			path = Response;
 			sourceTree = "<group>";
 		};
 		6CD84987D4F82F71D0659C80C05221D4 /* Pods-KTNetwork_Tests */ = {

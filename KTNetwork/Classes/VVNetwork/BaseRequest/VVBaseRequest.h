@@ -36,19 +36,19 @@ typedef NS_ENUM(NSInteger,VVResponseSerializerType)
 };
 
 typedef NS_ENUM(NSInteger,VVNetworkErrorType) {
-  /// the request not support signature
-  VVNetworkErrorNotSupportSignature = 10000,
-  /// the response is not a valid json
-  VVNetworkErrorInvalidJSONFormat,
+	/// the request not support signature
+	VVNetworkErrorNotSupportSignature = 10000,
+	/// the response is not a valid json
+	VVNetworkErrorInvalidJSONFormat,
 };
 
 typedef NS_ENUM(NSInteger,VVDownloadBackgroundPolicy) {
- // if the download task not complete, it will apply to some minutes to download
-  VVDownloadBackgroundDefault = 0,
-  // if the download task not complete,it forbidden to download at background
-  VVDownloadBackgroundForbidden,
-  // if the download task not complete,it apply download at background until complete
-  VVDownloadBackgroundRequire,
+	// if the download task not complete, it will apply to some minutes to download
+	VVDownloadBackgroundDefault = 0,
+	// if the download task not complete,it forbidden to download at background
+	VVDownloadBackgroundForbidden,
+	// if the download task not complete,it apply download at background until complete
+	VVDownloadBackgroundRequire,
 };
 
 static NSString * const VVNetworkErrorDomain = @"VVNetworkError";

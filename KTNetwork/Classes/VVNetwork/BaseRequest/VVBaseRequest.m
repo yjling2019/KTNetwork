@@ -326,7 +326,6 @@
 
 @property (nonatomic, copy, readwrite) NSString *tempFilePath;
 
-
 @end
 
 @implementation VVBaseDownloadRequest
@@ -391,7 +390,6 @@
 //    }
 //    return _tempFilePath;
 }
-
 
 @end
 
