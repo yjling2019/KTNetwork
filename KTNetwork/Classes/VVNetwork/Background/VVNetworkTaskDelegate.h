@@ -6,7 +6,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "VVBaseRequest.h"
+#import "VVBaseDownloadRequest.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

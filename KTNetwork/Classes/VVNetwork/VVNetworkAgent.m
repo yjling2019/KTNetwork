@@ -7,17 +7,17 @@
 //
 
 #import "VVNetworkAgent.h"
-#import "VVBaseRequest.h"
-//#import <AFNetworking/AFNetworking.h>
 #import <AFNetworking/AFHTTPSessionManager.h>
-
-#import "VVNetworkConfig.h"
+#import "VVBaseRequest.h"
+#import "VVBaseUploadRequest.h"
+#import "VVBaseDownloadRequest.h"
 #import "VVGroupRequest.h"
+#import "VVBatchRequest.h"
+#import "VVChainRequest.h"
+#import "VVNetworkConfig.h"
 #import "VVMockManager.h"
 #import "VVBackgroundSessionManager.h"
 #import "TDScope.h"
-#import "VVBatchRequest.h"
-#import "VVChainRequest.h"
 
 @interface VVBaseRequest(VVNetworkAgent)
 

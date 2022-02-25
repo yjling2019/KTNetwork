@@ -11,6 +11,8 @@
 #import "VVBaseRequest+Private.h"
 #import "VVGroupRequest+Private.h"
 #import "VVBaseRequest+Group.h"
+#import "VVBaseDownloadRequest.h"
+#import "VVBaseUploadRequest.h"
 
 @interface VVChainRequest()
 

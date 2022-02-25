@@ -12,6 +12,8 @@
 #import "VVGroupRequest+Private.h"
 #import "VVChainRequest.h"
 #import "VVBaseRequest+Group.h"
+#import "VVBaseDownloadRequest.h"
+#import "VVBaseUploadRequest.h"
 
 @interface VVBatchRequest()
 
