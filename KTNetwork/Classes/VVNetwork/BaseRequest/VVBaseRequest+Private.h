@@ -6,30 +6,45 @@
 //
 
 #import "VVBaseRequest.h"
+#import "VVBaseUploadRequest.h"
+#import "VVBaseDownloadRequest.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VVBaseRequest()
 
-@property (nonatomic, strong, readwrite) NSURLSessionTask *requestTask;
+@property (nonatomic, strong) NSURLSessionTask *requestTask;
 
-@property (nonatomic, strong, readwrite, nullable) id responseObject;
+@property (nonatomic, assign) BOOL isDataFromCache;
 
-@property (nonatomic, strong, readwrite, nullable) NSDictionary *responseJSONObject;
+@property (nonatomic, strong, nullable) id responseObject;
+@property (nonatomic, strong, nullable) NSDictionary *responseJSONObject;
+@property (nonatomic, strong, nullable) id parsedData;
 
-@property (atomic, strong, readwrite, nullable) NSError *error;
+@property (atomic, strong, nullable) NSError *error;
 
-@property (nonatomic, assign, readwrite) BOOL isDataFromCache;
 /// the request success block
 @property (nonatomic, copy, nullable) void(^successBlock)(__kindof VVBaseRequest *request);
 /// the request failure block
 @property (nonatomic, copy, nullable) void(^failureBlock)(__kindof VVBaseRequest *request);
+
+@end
+
+
+@interface VVBaseUploadRequest ()
+
 /// the download/upload request progress block
 @property (nonatomic, copy, nullable) void(^progressBlock)(NSProgress *progress);
 /// when upload data cofig the formData
 @property (nonatomic, copy, nullable) void (^formDataBlock)(id<AFMultipartFormData> formData);
 
-@property (nonatomic, strong, readwrite, nullable) id parsedData;
+@end
+
+
+@interface VVBaseDownloadRequest ()
+
+/// the download/upload request progress block
+@property (nonatomic, copy, nullable) void(^progressBlock)(NSProgress *progress);
 
 @end
 
