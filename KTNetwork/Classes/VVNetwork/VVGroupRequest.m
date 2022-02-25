@@ -40,7 +40,7 @@
 @interface VVGroupRequest()
 
 /// the array of the VVBaseRequest
-@property (nonatomic, strong, readwrite) NSMutableArray<__kindof NSObject<VVRequestInGroupProtocol> *> *requestArray;
+@property (nonatomic, strong, readwrite) NSMutableArray<__kindof NSObject<VVGroupChildRequestProtocol> *> *requestArray;
 /// the block of success
 @property (nonatomic, copy, nullable) void (^successBlock)(__kindof VVGroupRequest *request);
 /// the block of failure
@@ -50,7 +50,7 @@
 /// the status of the VVGroupRequest is executing or not
 @property (nonatomic, assign) BOOL executing;
 /// the failed requests
-@property (nonatomic, strong, readwrite, nullable) NSMutableArray<__kindof NSObject<VVRequestInGroupProtocol> *> *failedRequests;
+@property (nonatomic, strong, readwrite, nullable) NSMutableArray<__kindof NSObject<VVGroupChildRequestProtocol> *> *failedRequests;
 /// the status of the groupRequest is complete inadvance
 @property (nonatomic, assign, readwrite) BOOL inAdvanceCompleted;
 
@@ -60,8 +60,8 @@
 @implementation VVGroupRequest
 @synthesize isIndependentRequest;
 @synthesize groupRequest;
-@synthesize groupSuccessBlock;
-@synthesize groupFailureBlock;
+@synthesize childSuccessBlock;
+@synthesize childFailureBlock;
 
 - (instancetype)init
 {
@@ -73,9 +73,9 @@
     return self;
 }
 
-- (void)addRequest:(__kindof NSObject<VVRequestInGroupProtocol> *)request
+- (void)addRequest:(__kindof NSObject<VVGroupChildRequestProtocol> *)request
 {
-    if (![request conformsToProtocol:@protocol(VVRequestInGroupProtocol)]) {
+    if (![request conformsToProtocol:@protocol(VVGroupChildRequestProtocol)]) {
 #if DEBUG
         NSAssert(NO, @"makesure request is conforms to protocol VVRequestInGroupProtocol");
 #endif
@@ -108,7 +108,7 @@
 #endif
         return;
     }
-    for (__kindof NSObject<VVRequestInGroupProtocol> *request  in requestArray) {
+    for (__kindof NSObject<VVGroupChildRequestProtocol> *request  in requestArray) {
         [self addRequest:request];
     }
 }
@@ -228,21 +228,21 @@
                         failure:(void(^)(__kindof VVGroupRequest *request))failureBlock
 {
     NSAssert([request isKindOfClass:[VVGroupRequest class]], @"make sure [request isKindOfClass:[VVGroupRequest class]] be YES");
-    if (request.groupSuccessBlock
-        || request.groupFailureBlock) {
+    if (request.childSuccessBlock
+        || request.childFailureBlock) {
 #if DEBUG
-    NSAssert(!request.groupSuccessBlock, @"can't config the successBlock");
-    NSAssert(!request.groupFailureBlock, @"can't config the failureBlock");
+    NSAssert(!request.childSuccessBlock, @"can't config the successBlock");
+    NSAssert(!request.childFailureBlock, @"can't config the failureBlock");
 #else
         return;
 #endif
     }
-    request.groupSuccessBlock = ^(NSObject<VVRequestInGroupProtocol> * _Nonnull request) {
+    request.childSuccessBlock = ^(NSObject<VVGroupChildRequestProtocol> * _Nonnull request) {
         if (successBlock) {
             successBlock((VVGroupRequest *)request);
         }
     };
-    request.groupFailureBlock = ^(NSObject<VVRequestInGroupProtocol> * _Nonnull request) {
+    request.childFailureBlock = ^(NSObject<VVGroupChildRequestProtocol> * _Nonnull request) {
         if (failureBlock) {
             failureBlock((VVGroupRequest *)request);
         }
@@ -277,11 +277,11 @@
     if (self.failureBlock) {
         self.failureBlock = nil;
     }
-    if (self.groupSuccessBlock) {
-        self.groupSuccessBlock = nil;
+    if (self.childSuccessBlock) {
+        self.childSuccessBlock = nil;
     }
-    if (self.groupFailureBlock) {
-        self.groupFailureBlock = nil;
+    if (self.childFailureBlock) {
+        self.childFailureBlock = nil;
     }
 }
 
@@ -292,7 +292,7 @@
 
 @interface VVBatchRequest()
 
-@property (nonatomic, strong, nullable) NSMutableArray<__kindof NSObject<VVRequestInGroupProtocol> *> *requireSuccessRequests;
+@property (nonatomic, strong, nullable) NSMutableArray<__kindof NSObject<VVGroupChildRequestProtocol> *> *requireSuccessRequests;
 
 @end
 
@@ -318,7 +318,7 @@
         }
     }
     
-    for (__kindof NSObject<VVRequestInGroupProtocol> *request in self.requestArray) {
+    for (__kindof NSObject<VVGroupChildRequestProtocol> *request in self.requestArray) {
         
         if ([request isKindOfClass:[VVBaseUploadRequest class]]) {
             VVBaseUploadRequest *uploadRequest = (VVBaseUploadRequest *)request;
@@ -374,11 +374,11 @@
     }
 }
 
-- (void)handleSuccessOfRequest:(__kindof NSObject<VVRequestInGroupProtocol> *)request
+- (void)handleSuccessOfRequest:(__kindof NSObject<VVGroupChildRequestProtocol> *)request
 {
     self.finishedCount++;
-    if (request.groupSuccessBlock) {
-        request.groupSuccessBlock(request);
+    if (request.childSuccessBlock) {
+        request.childSuccessBlock(request);
     }
     if (self.finishedCount == self.requestArray.count) {
         //the last request success, the batchRequest should call success block
@@ -386,25 +386,25 @@
     }
 }
 
-- (void)handleFailureOfRequest:(__kindof NSObject<VVRequestInGroupProtocol> *)request
+- (void)handleFailureOfRequest:(__kindof NSObject<VVGroupChildRequestProtocol> *)request
 {
     if (!self.failedRequests) {
         self.failedRequests = [NSMutableArray new];
     }
     if ([self.requireSuccessRequests containsObject:request]) {
         [self.failedRequests addObject:request];
-        if (request.groupFailureBlock) {
-            request.groupFailureBlock(request);
+        if (request.childFailureBlock) {
+            request.childFailureBlock(request);
         }
-        for (__kindof NSObject<VVRequestInGroupProtocol> *tmpRequest in [self.requestArray copy]) {
+        for (__kindof NSObject<VVGroupChildRequestProtocol> *tmpRequest in [self.requestArray copy]) {
             [tmpRequest stop];
         }
         [self finishAllRequestsWithFailureBlock];
     } else {
         self.finishedCount++;
         [self.failedRequests addObject:request];
-        if (request.groupFailureBlock) {
-            request.groupFailureBlock(request);
+        if (request.childFailureBlock) {
+            request.childFailureBlock(request);
         }
         if (self.finishedCount == self.requestArray.count) {
             if (self.failedRequests.count != self.requestArray.count) {
@@ -455,11 +455,11 @@
 #endif
 }
 
-- (void)configRequireSuccessRequests:(nullable NSArray <__kindof NSObject<VVRequestInGroupProtocol> *> *)requests
+- (void)configRequireSuccessRequests:(nullable NSArray <__kindof NSObject<VVGroupChildRequestProtocol> *> *)requests
 {
  
-    for (__kindof NSObject<VVRequestInGroupProtocol> *request in requests) {
-        if (![request conformsToProtocol:@protocol(VVRequestInGroupProtocol)]) {
+    for (__kindof NSObject<VVGroupChildRequestProtocol> *request in requests) {
+        if (![request conformsToProtocol:@protocol(VVGroupChildRequestProtocol)]) {
 #if DEBUG
             NSAssert(NO, @"please make sure request conforms protocol VVRequestInGroupProtocol");
 #endif
@@ -483,7 +483,7 @@
 
 @interface VVChainRequest()
 
-@property (nonatomic, strong, nullable) __kindof NSObject<VVRequestInGroupProtocol> *lastRequest;
+@property (nonatomic, strong, nullable) __kindof NSObject<VVGroupChildRequestProtocol> *lastRequest;
 @property (nonatomic, assign, readonly) BOOL canStartNextRequest;
 
 @end
@@ -622,7 +622,7 @@
             return;
         }
     }
-    for (__kindof NSObject<VVRequestInGroupProtocol> *tmpRequest in [self.requestArray copy]) {
+    for (__kindof NSObject<VVGroupChildRequestProtocol> *tmpRequest in [self.requestArray copy]) {
         [tmpRequest stop];
     }
     [self handleAccessoryWithBlock:^{

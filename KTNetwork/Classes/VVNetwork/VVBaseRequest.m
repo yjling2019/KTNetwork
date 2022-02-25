@@ -42,8 +42,8 @@
 @implementation VVBaseRequest
 @synthesize isIndependentRequest;
 @synthesize groupRequest;
-@synthesize groupSuccessBlock;
-@synthesize groupFailureBlock;
+@synthesize childSuccessBlock;
+@synthesize childFailureBlock;
 
 
 - (instancetype)init
@@ -66,11 +66,11 @@
     if (self.failureBlock) {
         self.failureBlock = nil;
     }
-    if (self.groupSuccessBlock) {
-        self.groupSuccessBlock = nil;
+    if (self.childSuccessBlock) {
+        self.childSuccessBlock = nil;
     }
-    if (self.groupFailureBlock) {
-        self.groupFailureBlock = nil;
+    if (self.childFailureBlock) {
+        self.childFailureBlock = nil;
     }
 }
 
