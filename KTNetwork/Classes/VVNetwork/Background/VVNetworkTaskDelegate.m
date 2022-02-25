@@ -10,7 +10,6 @@
 
 @interface VVNetworkBaseDownloadTaskDelegate()
 @property (nonatomic, weak, readwrite) __kindof VVBaseDownloadRequest *request;
-
 @end
 
 @implementation VVNetworkBaseDownloadTaskDelegate
@@ -27,11 +26,9 @@
 - (void)URLSession:(NSURLSession *)session task:(__kindof NSURLSessionTask *)task
                       didBecomeInvalidWithError:(NSError *)error
 {
-    
 }
 
 @end
-
 
 
 @interface VVNetworkDownloadTaskDelegate()
@@ -76,11 +73,11 @@
             @strongify(task);
             [task suspend];
         };
-    #if AF_CAN_USE_AT_AVAILABLE
+#if AF_CAN_USE_AT_AVAILABLE
         if (@available(iOS 9, macOS 10.11, *))
-    #else
+#else
         if ([_progress respondsToSelector:@selector(setResumingHandler:)])
-    #endif
+#endif
         {
             _progress.resumingHandler = ^{
                 @strongify(task);
@@ -107,9 +104,9 @@
                       ofObject:(id)object
                         change:(NSDictionary<NSString *,id> *)change
                        context:(void *)context {
-        if (self.downloadProgressBlock) {
-            self.downloadProgressBlock(object);
-        }
+	if (self.downloadProgressBlock) {
+		self.downloadProgressBlock(object);
+	}
 }
 
 #pragma mark - NSURLSessionTaskDelegate
@@ -216,11 +213,11 @@ didCompleteWithError:(NSError *)error
             @strongify(task);
             [task suspend];
         };
-    #if AF_CAN_USE_AT_AVAILABLE
+#if AF_CAN_USE_AT_AVAILABLE
         if (@available(iOS 9, macOS 10.11, *))
-    #else
+#else
         if ([_progress respondsToSelector:@selector(setResumingHandler:)])
-    #endif
+#endif
         {
             _progress.resumingHandler = ^{
                 @strongify(task);
@@ -249,15 +246,16 @@ didCompleteWithError:(NSError *)error
         [self.request.requestTask resume];
     }
 }
+
 #pragma mark - NSProgress Tracking
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
                       ofObject:(id)object
                         change:(NSDictionary<NSString *,id> *)change
                        context:(void *)context {
-        if (self.downloadProgressBlock) {
-            self.downloadProgressBlock(object);
-        }
+	if (self.downloadProgressBlock) {
+		self.downloadProgressBlock(object);
+	}
 }
 
 #pragma mark - NSURLSessionTaskDelegate
@@ -268,6 +266,7 @@ didCompleteWithError:(NSError *)error
         self.completionHandler(task.response, error);
     }
 }
+
 - (void)URLSession:(NSURLSession *)session task:(__kindof NSURLSessionTask *)task
                       didBecomeInvalidWithError:(NSError *)error
 {
@@ -281,7 +280,6 @@ didCompleteWithError:(NSError *)error
         NSAssert(NO, @"make sure [task isKindOfClass:[NSURLSessionDownloadTask class]] be YES");
 #endif
     }
-    
 }
 
 #pragma mark - NSURLSessionDownloadDelegate

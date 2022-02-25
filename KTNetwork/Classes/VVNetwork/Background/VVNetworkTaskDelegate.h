@@ -7,8 +7,11 @@
 
 #import <Foundation/Foundation.h>
 #import "VVBaseRequest.h"
+
 NS_ASSUME_NONNULL_BEGIN
+
 @interface VVNetworkBaseDownloadTaskDelegate : NSObject
+
 @property (nonatomic, weak, readonly) __kindof VVBaseDownloadRequest *request;
 @property (nonatomic, copy) void(^downloadProgressBlock)(NSProgress *downloadProgress);
 @property (nonatomic, copy) void(^completionHandler)(NSURLResponse *response, NSError *error);
@@ -23,18 +26,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface VVNetworkDownloadTaskDelegate : VVNetworkBaseDownloadTaskDelegate
-<
-NSURLSessionDataDelegate
->
+@interface VVNetworkDownloadTaskDelegate : VVNetworkBaseDownloadTaskDelegate < NSURLSessionDataDelegate>
 
 @end
 
-
-@interface VVNetworkBackgroundDownloadTaskDelegate : VVNetworkBaseDownloadTaskDelegate
-<
-NSURLSessionDownloadDelegate
->
+@interface VVNetworkBackgroundDownloadTaskDelegate : VVNetworkBaseDownloadTaskDelegate <NSURLSessionDownloadDelegate>
 
 @end
 

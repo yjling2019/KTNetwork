@@ -9,6 +9,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VVBatchRequest;
+
+typedef void(^KTBatchRequestBlock)(VVBatchRequest *batchRequest);
+
 @interface VVBatchRequest : VVGroupRequest
 
 /*
@@ -17,10 +21,10 @@ NS_ASSUME_NONNULL_BEGIN
  if config the requests,only the requests in the config requests all success,then the batchRequest success block will be called,if one of request in config request failed,the batchRequest fail block will be called.
  this method should invoke after you add the request in the batchRequest.
  */
-- (void)configRequireSuccessRequests:(nullable NSArray <__kindof NSObject<VVGroupChildRequestProtocol> *> *)requests;
+- (void)configRequireSuccessRequests:(nullable NSArray <__kindof NSObject <VVGroupChildRequestProtocol> *> *)requests;
 
-- (void)startWithCompletionSuccess:(nullable void (^)(VVBatchRequest *batchRequest))successBlock
-						   failure:(nullable void (^)(VVBatchRequest *batchRequest))failureBlock;
+- (void)startWithCompletionSuccess:(nullable KTBatchRequestBlock)successBlock
+						   failure:(nullable KTBatchRequestBlock)failureBlock;
 
 @end
 

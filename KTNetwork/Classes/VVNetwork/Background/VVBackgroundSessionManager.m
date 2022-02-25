@@ -7,22 +7,12 @@
 
 #import "VVBackgroundSessionManager.h"
 #import "VVNetworkTaskDelegate.h"
-#import "VVBaseRequest.h"
+#import "VVBaseRequest+Private.h"
 
 static NSString * const kVVNetwork_background_task_identifier = @"kVVNetwork_background_task_identifier";
 
-@interface VVBaseRequest(VVBackgroundSessionManager)
-
-@property (nonatomic, strong, readwrite) NSURLSessionTask *requestTask;
-
-@end
-
-@implementation VVBaseRequest(VVBackgroundSessionManager)
-@dynamic requestTask;
-
-@end
-
 @interface VVBackgroundSessionManager()<NSURLSessionDataDelegate,NSURLSessionDownloadDelegate>
+
 /// the background url task identifer
 @property (nonatomic, copy, readwrite, nonnull) NSString *backgroundTaskIdentifier;
 /// the background urlSessionDataTask
@@ -30,6 +20,7 @@ static NSString * const kVVNetwork_background_task_identifier = @"kVVNetwork_bac
 ///the key value of the taskIdentier and the real delegate of NSURLSessionDelegate
 @property (nonatomic, strong, nonnull) NSMutableDictionary<NSNumber *,id> *taskIdentifierAndDelegateDic;
 @property (nonatomic, strong, nonnull) NSLock *lock;
+
 @end
 
 @implementation VVBackgroundSessionManager
@@ -225,7 +216,6 @@ static NSString * const kVVNetwork_background_task_identifier = @"kVVNetwork_bac
          background_identifier = UIBackgroundTaskInvalid;
         }];
     }
-    
 }
 
 - (id)delegateForkTaskIdentifier:(NSUInteger)taskIdentifier

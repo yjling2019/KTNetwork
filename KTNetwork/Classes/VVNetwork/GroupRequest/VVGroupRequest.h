@@ -15,15 +15,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VVGroupRequest : NSObject<VVGroupChildRequestProtocol>
 
-/// the array of the VVBaseRequest
-@property (nonatomic, strong, readonly) NSMutableArray<__kindof NSObject<VVGroupChildRequestProtocol> *> *requestArray;
 /// the class to handle the request indicator
 @property (nonatomic, strong, nullable) Class<VVRequestAccessoryProtocol> requestAccessory;
-/// the failed requests
-@property (nonatomic, strong, readonly, nullable) NSMutableArray<__kindof NSObject<VVGroupChildRequestProtocol> *> *failedRequests;
 
 /// the status of the groupRequest is complete inadvance
 @property (nonatomic, assign, readonly) BOOL inAdvanceCompleted;
+/// the array of the VVBaseRequest
+@property (nonatomic, strong, readonly) NSMutableArray<__kindof NSObject<VVGroupChildRequestProtocol> *> *requestArray;
+/// the failed requests
+@property (nonatomic, strong, readonly, nullable) NSMutableArray<__kindof NSObject<VVGroupChildRequestProtocol> *> *failedRequests;
 
 /// add child request,make sure request conform protocol VVRequestProtocol
 /// @param request request
@@ -33,8 +33,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param requestArray requestArray
 - (void)addRequestsWithArray:(NSArray<__kindof NSObject<VVGroupChildRequestProtocol> *>*)requestArray;
 
+/// start current request
 - (void)start;
 
+/// stop current request
 - (void)stop;
 
 /// inadvance self with the result

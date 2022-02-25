@@ -29,7 +29,6 @@ NS_ASSUME_NONNULL_BEGIN
 /// the failed requests
 @property (nonatomic, strong, nullable) NSMutableArray<__kindof NSObject<VVGroupChildRequestProtocol> *> *failedRequests;
 
-
 - (void)handleAccessoryWithBlock:(void(^)(void))block;
 
 - (void)clearCompletionBlock;

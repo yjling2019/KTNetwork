@@ -26,4 +26,5 @@
 - (void)inAdvanceCompleteGroupRequestWithResult:(BOOL)isSuccess;
 
 @end
+
 #endif /* VVRequestInGroupProtocol_h */

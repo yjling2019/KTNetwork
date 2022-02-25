@@ -29,9 +29,11 @@
 #endif
 		return;
 	}
+	
 	if (self.executing) {
 		return;
 	}
+	
 	self.executing = YES;
 	if (self.isIndependentRequest) {
 		if (self.requestAccessory
@@ -41,7 +43,6 @@
 	}
 	
 	for (__kindof NSObject<VVGroupChildRequestProtocol> *request in self.requestArray) {
-		
 		if ([request isKindOfClass:[VVBaseUploadRequest class]]) {
 			VVBaseUploadRequest *uploadRequest = (VVBaseUploadRequest *)request;
 			@weakify(self);
@@ -113,6 +114,7 @@
 	if (!self.failedRequests) {
 		self.failedRequests = [NSMutableArray new];
 	}
+	
 	if ([self.requireSuccessRequests containsObject:request]) {
 		[self.failedRequests addObject:request];
 		if (request.failureBlock) {
@@ -169,7 +171,6 @@
 	self.executing = NO;
 }
 
-
 - (void)inAdvanceCompleteWithResult:(BOOL)isSuccess
 {
 #if DEBUG
@@ -179,7 +180,6 @@
 
 - (void)configRequireSuccessRequests:(nullable NSArray <__kindof NSObject<VVGroupChildRequestProtocol> *> *)requests
 {
- 
 	for (__kindof NSObject<VVGroupChildRequestProtocol> *request in requests) {
 		if (![request conformsToProtocol:@protocol(VVGroupChildRequestProtocol)]) {
 #if DEBUG

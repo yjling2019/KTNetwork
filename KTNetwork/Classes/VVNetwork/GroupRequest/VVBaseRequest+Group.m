@@ -7,21 +7,23 @@
 
 #import "VVBaseRequest+Group.h"
 #import "VVGroupRequest.h"
+#import <objc/runtime.h>
+
+static char const *const kGroupRequest ="com.kotu.network.groupRequest";
 
 @implementation VVBaseRequest(Group)
 
 @dynamic successBlock;
 @dynamic failureBlock;
 
-#warning TODO 0225
 - (void)setGroupRequest:(__kindof VVGroupRequest *)groupRequest
 {
-	
+	objc_setAssociatedObject(self, kGroupRequest, groupRequest, OBJC_ASSOCIATION_RETAIN);
 }
 
 - (VVGroupRequest *)groupRequest
 {
-	return nil;
+	return objc_getAssociatedObject(self, kGroupRequest);
 }
 
 #pragma mark - - VVRequestInGroupProtocol - -

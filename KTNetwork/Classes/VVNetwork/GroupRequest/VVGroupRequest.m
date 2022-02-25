@@ -93,10 +93,6 @@
 {
     if (self.groupRequest) {
         [self.groupRequest inAdvanceCompleteWithResult:isSuccess];
-    } else {
-#if DEBUG
-        NSAssert(NO, @"self.groupRequest is nil");
-#endif
     }
 }
 
