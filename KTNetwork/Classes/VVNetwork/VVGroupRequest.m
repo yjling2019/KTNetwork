@@ -10,11 +10,25 @@
 #import "TDScope.h"
 #import "VVBaseRequest+Private.h"
 
-@interface VVBaseRequest() <VVGroupChildRequestProtocol>
+@interface VVBaseRequest(VVGroupRequest) <VVGroupChildRequestProtocol>
 
 @end
 
 @implementation VVBaseRequest(VVGroupRequest)
+
+@dynamic successBlock;
+@dynamic failureBlock;
+
+#warning TODO 0225
+- (void)setGroupRequest:(__kindof VVGroupRequest *)groupRequest
+{
+	
+}
+
+- (VVGroupRequest *)groupRequest
+{
+	return nil;
+}
 
 #pragma mark - - VVRequestInGroupProtocol - -
 - (BOOL)isIndependentRequest

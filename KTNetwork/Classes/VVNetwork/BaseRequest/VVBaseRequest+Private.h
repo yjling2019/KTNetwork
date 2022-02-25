@@ -28,8 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) void(^failureBlock)(__kindof VVBaseRequest *request);
 /// the download/upload request progress block
 @property (nonatomic, copy, nullable) void(^progressBlock)(NSProgress *progress);
-/// is a default/download/upload request
-@property (nonatomic, assign) VVRequestType requestType;
 /// when upload data cofig the formData
 @property (nonatomic, copy, nullable) void (^formDataBlock)(id<AFMultipartFormData> formData);
 

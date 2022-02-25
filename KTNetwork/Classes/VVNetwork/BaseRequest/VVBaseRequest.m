@@ -43,13 +43,6 @@
 
 - (void)start
 {
-    if (self.requestType != VVRequestTypeDefault) {
-#if DEBUG
-		NSAssert(NO, @" request is upload request or download request,please use the specified func");
-#endif
-        return;
-    }
-    
     if (self.isIndependentRequest) {
         if (self.requestAccessory && [self.requestAccessory respondsToSelector:@selector(requestWillStart:)]) {
             [self.requestAccessory requestWillStart:self];
@@ -111,12 +104,6 @@
                          success:(nullable void(^)(__kindof VVBaseRequest *request))successBlock
                          failure:(nullable void(^)(__kindof VVBaseRequest *request))failureBlock
 {
-    if (self.requestType != VVRequestTypeDefault) {
- #if DEBUG
-         NSAssert(NO, @" request is upload request or download request,please use the specified func");
- #endif
-         return;
-     }
      self.parseBlock = parseBlock;
      self.successBlock = successBlock;
      self.failureBlock = failureBlock;
@@ -315,15 +302,6 @@
 
 @implementation VVBaseUploadRequest
 
-- (instancetype)init
-{
-    self = [super init];
-    if (self) {
-        self.requestType = VVRequestTypeUpload;
-    }
-    return self;
-}
-
 - (void)uploadWithProgress:(nullable void(^)(NSProgress *progress))uploadProgressBlock
              formDataBlock:(nullable void(^)(id <AFMultipartFormData> formData))formDataBlock
                    success:(nullable void(^)(__kindof VVBaseRequest *request))successBlock
@@ -335,6 +313,7 @@
     self.formDataBlock = formDataBlock;
     [[VVNetworkAgent sharedAgent] addRequest:self];
 }
+
 @end
 
 @interface VVBaseDownloadRequest()
@@ -362,15 +341,6 @@
         request.absoluteString = url;
     }
     return request;
-}
-
-- (instancetype)init
-{
-    self = [super init];
-    if (self) {
-        self.requestType = VVRequestTypeDownload;
-    }
-    return self;
 }
 
 - (NSString *)buildCustomRequestUrl

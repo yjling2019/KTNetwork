@@ -35,16 +35,6 @@ typedef NS_ENUM(NSInteger,VVResponseSerializerType)
     VVResponseSerializerTypeXMLParser,
 };
 
-typedef NS_ENUM(NSInteger,VVRequestType)
-{
-    /// 正常的网络请求
-    VVRequestTypeDefault = 0,
-    /// 下载文件的网路请求
-    VVRequestTypeDownload,
-    /// 上传内容的网络请求
-    VVRequestTypeUpload
-};
-
 typedef NS_ENUM(NSInteger,VVNetworkErrorType) {
   /// the request not support signature
   VVNetworkErrorNotSupportSignature = 10000,

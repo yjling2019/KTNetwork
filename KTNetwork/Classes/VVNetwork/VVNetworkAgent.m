@@ -32,8 +32,6 @@
 /// the request failure block
 @property (nonatomic, copy, nullable) void(^failureBlock)(__kindof VVBaseRequest *request);
 
-/// is a default/download/upload request
-@property (nonatomic, assign) VVRequestType requestType;
 /// when upload data cofig the formData
 @property (nonatomic, copy, nullable) void (^formDataBlock)(id<AFMultipartFormData> formData);
 /// the url has signatured
@@ -59,7 +57,6 @@
 @dynamic parseBlock;
 @dynamic successBlock;
 @dynamic failureBlock;
-@dynamic requestType;
 @dynamic formDataBlock;
 @dynamic signaturedUrl;
 @dynamic signaturedParams;
@@ -308,12 +305,13 @@
     }
     
     AFHTTPRequestSerializer *requestSerializer = [self requestSerializerForRequest:request];
-    if (request.requestType == VVRequestTypeDownload) {
+    if ([request isKindOfClass:[VVBaseDownloadRequest class]]) {
         return [self downloadTaskWithRequest:(VVBaseDownloadRequest *)request requestSerializer:requestSerializer URLString:url parameters:param error:error];
-    } else if (request.requestType == VVRequestTypeUpload) {
+    } else if ([request isKindOfClass:[VVBaseUploadRequest class]]) {
         return [self uploadTaskWithRequest:request requestSerializer:requestSerializer URLString:url parameters:param error:error];
-    }
-    return [self dataTaskWithRequest:request requestSerializer:requestSerializer URLString:url parameters:param error:error];
+	} else {
+		return [self dataTaskWithRequest:request requestSerializer:requestSerializer URLString:url parameters:param error:error];
+	}
 }
 
 - (NSURLSessionTask *)downloadTaskWithRequest:(__kindof VVBaseDownloadRequest *)request
@@ -402,7 +400,7 @@
     NSError *requestError = nil;
     BOOL succeed = NO;
     
-    if (request.requestType != VVRequestTypeDownload) {
+    if (![request isKindOfClass:[VVBaseDownloadRequest class]]) {
 		NSData *responseData = nil;
 		if ([request.responseObject isKindOfClass:[NSData class]]) {
 			responseData = (NSData *)request.responseObject;
@@ -464,7 +462,7 @@
 
 - (BOOL)validateResult:(__kindof VVBaseRequest *)request error:(NSError * _Nullable __autoreleasing *)error
 {
-    if (request.requestType == VVRequestTypeDownload) {
+    if ([request isKindOfClass:[VVBaseDownloadRequest class]]) {
         return YES;
     }
     BOOL result = YES;
