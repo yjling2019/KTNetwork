@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import <AFNetworking/AFHTTPSessionManager.h>
-#import "VVGroupChildRequestProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 @class VVBaseRequest,VVNetworkResponse;
@@ -77,7 +76,10 @@ static NSString * const VVNetworkErrorDomain = @"VVNetworkError";
 @end
 
 
-@interface VVBaseRequest : NSObject<VVGroupChildRequestProtocol>
+@interface VVBaseRequest : NSObject
+
+@property (nonatomic, assign, readonly) BOOL isIndependentRequest;
+
 
 /// the request apiName,fact is a path of url,it can contain path and query params
 @property (nonatomic, copy, nonnull) NSString *requestUrl;

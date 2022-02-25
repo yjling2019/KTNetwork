@@ -866,8 +866,7 @@
 				5DD7805627C8B40400D26784 /* GroupRequest */,
 				E991EB7CDE117912CED3EF506C1B2D28 /* VVBackgroundSessionManager.h */,
 				251ED4BF9A3CE85A3027645016EA52B8 /* VVBackgroundSessionManager.m */,
-				E19D656E2927A2BC1221BDE17C0E7452 /* VVBaseRequest.h */,
-				9D80CF2126AD5C6F880E9A0B0157190A /* VVBaseRequest.m */,
+				5DD7805727C8B7E500D26784 /* BaseRequest */,
 				1A495098747CDDB7F5282E45D05BBD1C /* VVGroupRequest.h */,
 				D3AFBC049E22D24E8315334FAE72BECE /* VVGroupRequest.m */,
 				10DF52ABE6E75281EACEF2E1324A6906 /* VVMockManager.h */,
@@ -949,6 +948,15 @@
 				D894E06D31B21AC3B3EFA10FB5A1D25E /* VVGroupChildRequestProtocol.h */,
 			);
 			path = GroupRequest;
+			sourceTree = "<group>";
+		};
+		5DD7805727C8B7E500D26784 /* BaseRequest */ = {
+			isa = PBXGroup;
+			children = (
+				E19D656E2927A2BC1221BDE17C0E7452 /* VVBaseRequest.h */,
+				9D80CF2126AD5C6F880E9A0B0157190A /* VVBaseRequest.m */,
+			);
+			path = BaseRequest;
 			sourceTree = "<group>";
 		};
 		6CD84987D4F82F71D0659C80C05221D4 /* Pods-KTNetwork_Tests */ = {

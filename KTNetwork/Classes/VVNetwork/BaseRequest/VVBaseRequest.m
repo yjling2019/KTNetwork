@@ -9,7 +9,6 @@
 #import "VVBaseRequest.h"
 #import "VVNetworkAgent.h"
 #import "VVNetworkConfig.h"
-#import "VVGroupRequest.h"
 
 @interface VVBaseRequest()
 
@@ -40,10 +39,10 @@
 @end
 
 @implementation VVBaseRequest
-@synthesize isIndependentRequest;
-@synthesize groupRequest;
-@synthesize childSuccessBlock;
-@synthesize childFailureBlock;
+//@synthesize isIndependentRequest;
+//@synthesize groupRequest;
+//@synthesize successBlock;
+//@synthesize failureBlock;
 
 
 - (instancetype)init
@@ -66,11 +65,11 @@
     if (self.failureBlock) {
         self.failureBlock = nil;
     }
-    if (self.childSuccessBlock) {
-        self.childSuccessBlock = nil;
+    if (self.successBlock) {
+        self.successBlock = nil;
     }
-    if (self.childFailureBlock) {
-        self.childFailureBlock = nil;
+    if (self.failureBlock) {
+        self.failureBlock = nil;
     }
 }
 
@@ -228,23 +227,6 @@
 {
     if ([[VVNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(clearResponseFromCacheOfRequest:)]) {
         [[VVNetworkConfig sharedConfig].requestHelper clearResponseFromCacheOfRequest:self];
-    }
-}
-
-#pragma mark - - VVRequestInGroupProtocol - -
-- (BOOL)isIndependentRequest
-{
-    return self.groupRequest?NO:YES;
-}
-
-- (void)inAdvanceCompleteGroupRequestWithResult:(BOOL)isSuccess
-{
-    if (self.groupRequest) {
-        [self.groupRequest inAdvanceCompleteWithResult:isSuccess];
-    }else {
-#if DEBUG
-        NSAssert(NO, @"self.groupRequest is nil");
-#endif
     }
 }
 

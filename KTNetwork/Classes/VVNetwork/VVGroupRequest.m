@@ -9,7 +9,7 @@
 #import "VVNetworkAgent.h"
 #import "TDScope.h"
 
-@interface VVBaseRequest(VVGroupRequest)
+@interface VVBaseRequest(VVGroupRequest) <VVGroupChildRequestProtocol>
 
 /// the download/upload request progress block
 @property (nonatomic, copy, nullable) void(^progressBlock)(NSProgress *progress);
@@ -29,6 +29,25 @@
 @dynamic requestType;
 @dynamic parseBlock;
 
+
+#pragma mark - - VVRequestInGroupProtocol - -
+- (BOOL)isIndependentRequest
+{
+	return self.groupRequest?NO:YES;
+}
+
+- (void)inAdvanceCompleteGroupRequestWithResult:(BOOL)isSuccess
+{
+	if (self.groupRequest) {
+		[self.groupRequest inAdvanceCompleteWithResult:isSuccess];
+	}else {
+#if DEBUG
+		NSAssert(NO, @"self.groupRequest is nil");
+#endif
+	}
+}
+
+
 @end
 
 @interface VVGroupRequest()
@@ -36,9 +55,9 @@
 /// the array of the VVBaseRequest
 @property (nonatomic, strong, readwrite) NSMutableArray<__kindof NSObject<VVGroupChildRequestProtocol> *> *requestArray;
 /// the block of success
-@property (nonatomic, copy, nullable) void (^successBlock)(__kindof VVGroupRequest *request);
+@property (nonatomic, copy, nullable) void (^groupSuccessBlock)(__kindof VVGroupRequest *request);
 /// the block of failure
-@property (nonatomic, copy, nullable) void (^failureBlock)(__kindof VVGroupRequest *request);
+@property (nonatomic, copy, nullable) void (^groupFailureBlock)(__kindof VVGroupRequest *request);
 /// the count of finished requests
 @property (nonatomic, assign) NSInteger finishedCount;
 /// the status of the VVGroupRequest is executing or not
@@ -54,8 +73,8 @@
 @implementation VVGroupRequest
 @synthesize isIndependentRequest;
 @synthesize groupRequest;
-@synthesize childSuccessBlock;
-@synthesize childFailureBlock;
+@synthesize successBlock;
+@synthesize failureBlock;
 
 - (instancetype)init
 {
@@ -160,17 +179,17 @@
 
 - (void)clearCompletionBlock
 {
+    if (self.groupSuccessBlock) {
+        self.groupSuccessBlock = nil;
+    }
+    if (self.groupFailureBlock) {
+        self.groupFailureBlock = nil;
+    }
     if (self.successBlock) {
         self.successBlock = nil;
     }
     if (self.failureBlock) {
         self.failureBlock = nil;
-    }
-    if (self.childSuccessBlock) {
-        self.childSuccessBlock = nil;
-    }
-    if (self.childFailureBlock) {
-        self.childFailureBlock = nil;
     }
 }
 
@@ -266,8 +285,8 @@
 - (void)handleSuccessOfRequest:(__kindof NSObject<VVGroupChildRequestProtocol> *)request
 {
     self.finishedCount++;
-    if (request.childSuccessBlock) {
-        request.childSuccessBlock(request);
+    if (request.successBlock) {
+        request.successBlock(request);
     }
     if (self.finishedCount == self.requestArray.count) {
         //the last request success, the batchRequest should call success block
@@ -282,8 +301,8 @@
     }
     if ([self.requireSuccessRequests containsObject:request]) {
         [self.failedRequests addObject:request];
-        if (request.childFailureBlock) {
-            request.childFailureBlock(request);
+        if (request.failureBlock) {
+            request.failureBlock(request);
         }
         for (__kindof NSObject<VVGroupChildRequestProtocol> *tmpRequest in [self.requestArray copy]) {
             [tmpRequest stop];
@@ -292,8 +311,8 @@
     } else {
         self.finishedCount++;
         [self.failedRequests addObject:request];
-        if (request.childFailureBlock) {
-            request.childFailureBlock(request);
+        if (request.failureBlock) {
+            request.failureBlock(request);
         }
         if (self.finishedCount == self.requestArray.count) {
             if (self.failedRequests.count != self.requestArray.count) {
@@ -310,8 +329,8 @@
 - (void)finishAllRequestsWithSuccessBlock
 {
     [self handleAccessoryWithBlock:^{
-        if (self.successBlock) {
-            self.successBlock(self);
+        if (self.groupSuccessBlock) {
+            self.groupSuccessBlock(self);
         }
     }];
     [self stop];
@@ -320,8 +339,8 @@
 - (void)finishAllRequestsWithFailureBlock
 {
     [self handleAccessoryWithBlock:^{
-        if (self.failureBlock) {
-            self.failureBlock(self);
+        if (self.groupFailureBlock) {
+            self.groupFailureBlock(self);
         }
     }];
     [self stop];
@@ -361,8 +380,8 @@
 - (void)startWithCompletionSuccess:(nullable void (^)(VVBatchRequest *batchRequest))successBlock
                            failure:(nullable void (^)(VVBatchRequest *batchRequest))failureBlock
 {
-    self.successBlock = successBlock;
-    self.failureBlock = failureBlock;
+    self.groupSuccessBlock = successBlock;
+    self.groupFailureBlock = failureBlock;
     [[VVNetworkAgent sharedAgent] addBatchRequest:self];
 }
 
@@ -414,8 +433,8 @@
 - (void)startWithCompletionSuccess:(nullable void (^)(VVChainRequest *chainRequest))successBlock
                            failure:(nullable void (^)(VVChainRequest *chainRequest))failureBlock
 {
-    self.successBlock = successBlock;
-    self.failureBlock = failureBlock;
+    self.groupSuccessBlock = successBlock;
+    self.groupFailureBlock = failureBlock;
     [[VVNetworkAgent sharedAgent] addChainRequest:self];
 }
 
@@ -424,14 +443,14 @@
     self.inAdvanceCompleted = YES;
     if (isSuccess) {
         [self handleAccessoryWithBlock:^{
-            if (self.successBlock) {
-                self.successBlock(self);
+            if (self.groupSuccessBlock) {
+                self.groupSuccessBlock(self);
             }
         }];
     } else {
         [self handleAccessoryWithBlock:^{
-            if (self.failureBlock) {
-                self.failureBlock(self);
+            if (self.groupFailureBlock) {
+                self.groupFailureBlock(self);
             }
         }];
     }
@@ -480,8 +499,8 @@
 - (void)handleSuccessOfRequest:(__kindof VVBaseRequest *)request
 {
     self.lastRequest = request;
-	if (request.childSuccessBlock) {
-		request.childSuccessBlock(request);
+	if (request.successBlock) {
+		request.successBlock(request);
         if (self.inAdvanceCompleted) {
             return;
         }
@@ -490,8 +509,8 @@
         [self startNextRequest];
     } else {
         [self handleAccessoryWithBlock:^{
-            if (self.successBlock) {
-                self.successBlock(self);
+            if (self.groupSuccessBlock) {
+                self.groupSuccessBlock(self);
             }
         }];
         [self stop];
@@ -505,8 +524,8 @@
     }
     [self.failedRequests addObject:request];
     self.lastRequest = request;
-	if (request.childFailureBlock) {
-		request.childFailureBlock(request);
+	if (request.failureBlock) {
+		request.failureBlock(request);
         if (self.inAdvanceCompleted) {
             return;
         }
@@ -515,8 +534,8 @@
         [tmpRequest stop];
     }
     [self handleAccessoryWithBlock:^{
-        if (self.failureBlock) {
-            self.failureBlock(self);
+        if (self.groupFailureBlock) {
+            self.groupFailureBlock(self);
         }
     }];
     [self stop];
