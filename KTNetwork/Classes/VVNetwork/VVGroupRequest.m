@@ -8,27 +8,13 @@
 #import "VVGroupRequest.h"
 #import "VVNetworkAgent.h"
 #import "TDScope.h"
+#import "VVBaseRequest+Private.h"
 
-@interface VVBaseRequest(VVGroupRequest) <VVGroupChildRequestProtocol>
-
-/// the download/upload request progress block
-@property (nonatomic, copy, nullable) void(^progressBlock)(NSProgress *progress);
-/// when upload data cofig the formData
-@property (nonatomic, copy, nullable) void (^formDataBlock)(id<AFMultipartFormData> formData);
-/// is a default/download/upload request
-@property (nonatomic, assign) VVRequestType requestType;
-/// the parse block
-@property (nonatomic, copy, nullable) id(^parseBlock)(__kindof VVBaseRequest *request, NSRecursiveLock *lock);
+@interface VVBaseRequest() <VVGroupChildRequestProtocol>
 
 @end
 
 @implementation VVBaseRequest(VVGroupRequest)
-
-@dynamic progressBlock;
-@dynamic formDataBlock;
-@dynamic requestType;
-@dynamic parseBlock;
-
 
 #pragma mark - - VVRequestInGroupProtocol - -
 - (BOOL)isIndependentRequest
@@ -38,15 +24,11 @@
 
 - (void)inAdvanceCompleteGroupRequestWithResult:(BOOL)isSuccess
 {
-	if (self.groupRequest) {
-		[self.groupRequest inAdvanceCompleteWithResult:isSuccess];
-	}else {
-#if DEBUG
-		NSAssert(NO, @"self.groupRequest is nil");
-#endif
+	if (!self.groupRequest) {
+		return;
 	}
+	[self.groupRequest inAdvanceCompleteWithResult:isSuccess];
 }
-
 
 @end
 

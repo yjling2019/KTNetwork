@@ -102,6 +102,7 @@
 		5BCE6A3C3798DC89B07C3CD4CAC8CD97 /* KWNull.h in Headers */ = {isa = PBXBuildFile; fileRef = 0E6CAD97349B5EBF9E3C7970E8ECF399 /* KWNull.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5BFF4F31AD167C8256DF656382E89012 /* KWGenericMatchEvaluator.h in Headers */ = {isa = PBXBuildFile; fileRef = 9A1040AA1D82034FEC6ECF06B681118C /* KWGenericMatchEvaluator.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5C6C99F70342BB36C5793E7C2B458C64 /* KWContainStringMatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = 519D8F349D5F3206A722B6EA59C367BF /* KWContainStringMatcher.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5DD7805A27C8B82100D26784 /* VVBaseRequest+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 5DD7805827C8B82100D26784 /* VVBaseRequest+Private.h */; };
 		5F9A6B1F251E54709B343621609655C6 /* KWReporting.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A6CF013148E4439564C09B392FD9B19 /* KWReporting.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		604D3F76D9400BDEFBC6587EE6827933 /* KWBlock.m in Sources */ = {isa = PBXBuildFile; fileRef = AF557FD5A6755E030409377B8A11EEFF /* KWBlock.m */; };
 		634278532B85AB8514393C79C0F332B6 /* KWSymbolicator.m in Sources */ = {isa = PBXBuildFile; fileRef = 09874B4F225F2932A645B793D19A56FB /* KWSymbolicator.m */; };
@@ -414,6 +415,7 @@
 		5ABA044FA4C87EBA50F9E1E402F06828 /* KWStringPrefixMatcher.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = KWStringPrefixMatcher.m; path = Classes/Matchers/KWStringPrefixMatcher.m; sourceTree = "<group>"; };
 		5BA4F8B3E6EB0814411A2ACB0A2A3AF9 /* KWMessagePattern.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = KWMessagePattern.m; path = Classes/Core/KWMessagePattern.m; sourceTree = "<group>"; };
 		5C8588C2367573CD459C4A7167901932 /* KWExistVerifier.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = KWExistVerifier.h; path = Classes/Verifiers/KWExistVerifier.h; sourceTree = "<group>"; };
+		5DD7805827C8B82100D26784 /* VVBaseRequest+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "VVBaseRequest+Private.h"; sourceTree = "<group>"; };
 		5E8AB9EC56DFF3F99917BB732CBD2D15 /* KWBeMemberOfClassMatcher.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = KWBeMemberOfClassMatcher.h; path = Classes/Matchers/KWBeMemberOfClassMatcher.h; sourceTree = "<group>"; };
 		5ED320FDA58ECA31C9D8CB47F529F3B4 /* KWStringUtilities.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = KWStringUtilities.m; path = Classes/Core/KWStringUtilities.m; sourceTree = "<group>"; };
 		5F0AFD687F03D01856FED5783EF66E67 /* AFSecurityPolicy.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = AFSecurityPolicy.h; path = AFNetworking/AFSecurityPolicy.h; sourceTree = "<group>"; };
@@ -953,6 +955,7 @@
 		5DD7805727C8B7E500D26784 /* BaseRequest */ = {
 			isa = PBXGroup;
 			children = (
+				5DD7805827C8B82100D26784 /* VVBaseRequest+Private.h */,
 				E19D656E2927A2BC1221BDE17C0E7452 /* VVBaseRequest.h */,
 				9D80CF2126AD5C6F880E9A0B0157190A /* VVBaseRequest.m */,
 			);
@@ -1162,6 +1165,7 @@
 				0E255D314BA584FFB1689B5B92E5C1E7 /* VVMockManager.h in Headers */,
 				DA447FC9B6DBD9DCE8B233E0E4461EE4 /* VVMockURLProtocol.h in Headers */,
 				6395BA0BF2847ECEEE9F41B8CF105F71 /* VVNetwork.h in Headers */,
+				5DD7805A27C8B82100D26784 /* VVBaseRequest+Private.h in Headers */,
 				4F12F3FAC081435FAFF11F60B392F0C9 /* VVNetworkAgent.h in Headers */,
 				4509B68AA78C6D08422513F348126BF5 /* VVNetworkConfig.h in Headers */,
 				0CB888B37F60150B27927135134B1E51 /* VVNetworkResponse.h in Headers */,
