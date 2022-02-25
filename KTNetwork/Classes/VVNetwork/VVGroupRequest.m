@@ -19,10 +19,6 @@
 @property (nonatomic, assign) VVRequestType requestType;
 /// the parse block
 @property (nonatomic, copy, nullable) id(^parseBlock)(__kindof VVBaseRequest *request, NSRecursiveLock *lock);
-/// the childRequest success block
-@property (nonatomic, copy, nullable) void(^groupSuccessBlock)(__kindof VVBaseRequest *request);
-/// the childRequest failure block
-@property (nonatomic, copy, nullable) void(^groupFailureBlock)(__kindof VVBaseRequest *request);
 
 @end
 
@@ -32,8 +28,6 @@
 @dynamic formDataBlock;
 @dynamic requestType;
 @dynamic parseBlock;
-@dynamic groupSuccessBlock;
-@dynamic groupFailureBlock;
 
 @end
 
@@ -143,111 +137,6 @@
         NSAssert(NO, @"self.groupRequest is nil");
 #endif
     }
-}
-
-
-+ (void)configNormalRequest:(__kindof VVBaseRequest *)request
-                    success:(void(^)(__kindof VVBaseRequest *request))successBlock
-                    failure:(void(^)(__kindof VVBaseRequest *request))failureBlock;
-{
-    [self configNormalRequest:request parseBlock:nil success:successBlock failure:failureBlock];
-}
-
-+ (void)configNormalRequest:(__kindof VVBaseRequest *)request
-                 parseBlock:(nullable id(^)(__kindof VVBaseRequest *request, NSRecursiveLock *lock))parseBlock
-                    success:(void(^)(__kindof VVBaseRequest *request))successBlock
-                    failure:(void(^)(__kindof VVBaseRequest *request))failureBlock
-{
-    NSAssert(request.requestType == VVRequestTypeDefault, @"make sure request.requestType == VVRequestTypeDefault be YES");
-    if (request.parseBlock
-        || request.groupSuccessBlock
-        || request.groupFailureBlock) {
-#if DEBUG
-    NSAssert(!request.parseBlock, @"can't config the parseBlock");
-    NSAssert(!request.groupSuccessBlock, @"can't config the successBlock");
-    NSAssert(!request.groupFailureBlock, @"can't config the failureBlock");
-#else
-        return;
-#endif
-    }
-    request.parseBlock = parseBlock;
-    request.groupSuccessBlock = successBlock;
-    request.groupFailureBlock = failureBlock;
-}
-
-+ (void)configUploadRequest:(__kindof VVBaseUploadRequest *)request
-                   progress:(nullable void(^)(NSProgress *progress))uploadProgressBlock
-              formDataBlock:(nullable void(^)(id <AFMultipartFormData> formData))formDataBlock
-                    success:(nullable void(^)(__kindof VVBaseRequest *request))successBlock
-                    failure:(nullable void(^)(__kindof VVBaseRequest *request))failureBlock
-{
-    NSAssert(request.requestType == VVRequestTypeUpload, @"make sure request.requestType == VVRequestTypeUpload be YES");
-    if (request.progressBlock
-        || request.formDataBlock
-        || request.groupSuccessBlock
-        || request.groupFailureBlock) {
-#if DEBUG
-    NSAssert(!request.progressBlock, @"can't config the uploadProgressBlock");
-    NSAssert(!request.formDataBlock, @"can't config the formDataBlock");
-    NSAssert(!request.groupSuccessBlock, @"can't config the successBlock");
-    NSAssert(!request.groupFailureBlock, @"can't config the failureBlock");
-#else
-        return;
-#endif
-    }
-    request.progressBlock = uploadProgressBlock;
-    request.formDataBlock = formDataBlock;
-    request.groupSuccessBlock = successBlock;
-    request.groupFailureBlock = failureBlock;
-}
-
-+ (void)configDownloadRequest:(__kindof VVBaseDownloadRequest *)request
-                     progress:(nullable void(^)(NSProgress *downloadProgress))downloadProgressBlock
-                      success:(nullable void(^)(__kindof VVBaseRequest *request))successBlock
-                      failure:(nullable void(^)(__kindof VVBaseRequest *request))failureBlock
-{
-    NSAssert(request.requestType == VVRequestTypeDownload, @"make sure request.requestType == VVRequestTypeDownload be YES");
-    if (request.progressBlock
-        || request.groupSuccessBlock
-        || request.groupFailureBlock) {
-#if DEBUG
-    NSAssert(!request.progressBlock, @"can't config the downloadProgressBlock");
-    NSAssert(!request.groupSuccessBlock, @"can't config the successBlock");
-    NSAssert(!request.groupFailureBlock, @"can't config the failureBlock");
-#else
-        return;
-#endif
-    }
-    request.progressBlock = downloadProgressBlock;
-    request.groupSuccessBlock = successBlock;
-    request.groupFailureBlock = failureBlock;
-}
-
-+ (void)configChildGroupRequest:(__kindof VVGroupRequest *)request
-                        success:(void(^)(__kindof VVGroupRequest *request))successBlock
-                        failure:(void(^)(__kindof VVGroupRequest *request))failureBlock
-{
-    NSAssert([request isKindOfClass:[VVGroupRequest class]], @"make sure [request isKindOfClass:[VVGroupRequest class]] be YES");
-    if (request.childSuccessBlock
-        || request.childFailureBlock) {
-#if DEBUG
-    NSAssert(!request.childSuccessBlock, @"can't config the successBlock");
-    NSAssert(!request.childFailureBlock, @"can't config the failureBlock");
-#else
-        return;
-#endif
-    }
-    request.childSuccessBlock = ^(NSObject<VVGroupChildRequestProtocol> * _Nonnull request) {
-        if (successBlock) {
-            successBlock((VVGroupRequest *)request);
-        }
-    };
-    request.childFailureBlock = ^(NSObject<VVGroupChildRequestProtocol> * _Nonnull request) {
-        if (failureBlock) {
-            failureBlock((VVGroupRequest *)request);
-        }
-    };
-    
 }
 
 - (void)handleAccessoryWithBlock:(void(^)(void))block
@@ -591,8 +480,8 @@
 - (void)handleSuccessOfRequest:(__kindof VVBaseRequest *)request
 {
     self.lastRequest = request;
-    if (request.groupSuccessBlock) {
-        request.groupSuccessBlock(request);
+	if (request.childSuccessBlock) {
+		request.childSuccessBlock(request);
         if (self.inAdvanceCompleted) {
             return;
         }
@@ -616,8 +505,8 @@
     }
     [self.failedRequests addObject:request];
     self.lastRequest = request;
-    if (request.groupFailureBlock) {
-        request.groupFailureBlock(request);
+	if (request.childFailureBlock) {
+		request.childFailureBlock(request);
         if (self.inAdvanceCompleted) {
             return;
         }

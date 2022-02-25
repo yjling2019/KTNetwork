@@ -41,30 +41,6 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param isSuccess the result
 - (void)inAdvanceCompleteWithResult:(BOOL)isSuccess;
 
-+ (void)configNormalRequest:(__kindof VVBaseRequest *)request
-                    success:(void(^)(__kindof VVBaseRequest *request))successBlock
-                    failure:(void(^)(__kindof VVBaseRequest *request))failureBlock;
-
-+ (void)configNormalRequest:(__kindof VVBaseRequest *)request
-                 parseBlock:(nullable id(^)(__kindof VVBaseRequest *request, NSRecursiveLock *lock))parseBlock
-                    success:(void(^)(__kindof VVBaseRequest *request))successBlock
-                    failure:(void(^)(__kindof VVBaseRequest *request))failureBlock;
-
-+ (void)configUploadRequest:(__kindof VVBaseUploadRequest *)request
-                   progress:(nullable void(^)(NSProgress *progress))uploadProgressBlock
-              formDataBlock:(nullable void(^)(id <AFMultipartFormData> formData))formDataBlock
-                    success:(nullable void(^)(__kindof VVBaseRequest *request))successBlock
-                    failure:(nullable void(^)(__kindof VVBaseRequest *request))failureBlock;
-
-+ (void)configDownloadRequest:(__kindof VVBaseDownloadRequest *)request
-                     progress:(nullable void(^)(NSProgress *downloadProgress))downloadProgressBlock
-                      success:(nullable void(^)(__kindof VVBaseRequest *request))successBlock
-                      failure:(nullable void(^)(__kindof VVBaseRequest *request))failureBlock;
-
-+ (void)configChildGroupRequest:(__kindof VVGroupRequest *)request
-                        success:(void(^)(__kindof VVGroupRequest *request))successBlock
-                        failure:(void(^)(__kindof VVGroupRequest *request))failureBlock;
-
 @end
 
 #pragma mark - - VVBatchRequest - -
