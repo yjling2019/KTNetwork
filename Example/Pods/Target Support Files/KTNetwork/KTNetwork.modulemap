@@ -1,0 +1,6 @@
+framework module KTNetwork {
+  umbrella header "KTNetwork-umbrella.h"
+
+  export *
+  module * { export * }
+}

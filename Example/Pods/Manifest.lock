@@ -1,0 +1,41 @@
+PODS:
+  - AFNetworking (4.0.1):
+    - AFNetworking/NSURLSession (= 4.0.1)
+    - AFNetworking/Reachability (= 4.0.1)
+    - AFNetworking/Security (= 4.0.1)
+    - AFNetworking/Serialization (= 4.0.1)
+    - AFNetworking/UIKit (= 4.0.1)
+  - AFNetworking/NSURLSession (4.0.1):
+    - AFNetworking/Reachability
+    - AFNetworking/Security
+    - AFNetworking/Serialization
+  - AFNetworking/Reachability (4.0.1)
+  - AFNetworking/Security (4.0.1)
+  - AFNetworking/Serialization (4.0.1)
+  - AFNetworking/UIKit (4.0.1):
+    - AFNetworking/NSURLSession
+  - Kiwi (3.0.0)
+  - KTNetwork (0.1.0):
+    - AFNetworking (~> 4.0)
+
+DEPENDENCIES:
+  - Kiwi
+  - KTNetwork (from `../`)
+
+SPEC REPOS:
+  trunk:
+    - AFNetworking
+    - Kiwi
+
+EXTERNAL SOURCES:
+  KTNetwork:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  AFNetworking: 7864c38297c79aaca1500c33288e429c3451fdce
+  Kiwi: fbeafef0f00e4d8f7dcb3420a4930afe70af77f7
+  KTNetwork: bd36a482d32b325976891677b4fb8431c3f68e5c
+
+PODFILE CHECKSUM: 29310ffb6593c777fecc64f0d3048be858fc2675
+
+COCOAPODS: 1.10.1
