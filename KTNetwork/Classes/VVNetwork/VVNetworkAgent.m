@@ -25,8 +25,6 @@
 @property (nonatomic, strong, readwrite, nullable) NSError *error;
 /// the progressBlock of download/upload request
 @property (nonatomic, copy, nullable) void(^progressBlock)(NSProgress *progress);
-/// the parse block
-@property (nonatomic, copy, nullable) id(^parseBlock)(__kindof VVBaseRequest *request, NSRecursiveLock *lock);
 /// the request success block
 @property (nonatomic, copy, nullable) void(^successBlock)(__kindof VVBaseRequest *request);
 /// the request failure block
@@ -54,7 +52,6 @@
 @dynamic responseJSONObject;
 @dynamic error;
 @dynamic progressBlock;
-@dynamic parseBlock;
 @dynamic successBlock;
 @dynamic failureBlock;
 @dynamic formDataBlock;
@@ -104,8 +101,6 @@
 @property (nonatomic, strong, nonnull) NSMutableArray *bufferRequests;
 
 @property (nonatomic, strong, nonnull) VVBackgroundSessionManager *backgroundSessionMananger;
-@property (nonatomic, strong) NSRecursiveLock *parseLock;
-
 
 @end
 
@@ -140,7 +135,6 @@
         _jsonResponseSerializer = [self config_jsonResponseSerializer];
         _xmlParserResponseSerialzier = [self config_xmlParserResponseSerialzier];
         _backgroundSessionMananger = [VVBackgroundSessionManager new];
-        _parseLock = [[NSRecursiveLock alloc] init];
     }
     return self;
 }
@@ -260,7 +254,6 @@
     for (__kindof VVBaseRequest *request in allStartedRequests) {
         [request stop];
     }
-    
 }
 
 - (NSURLSessionTask *)sessionTaskForRequest:(__kindof VVBaseRequest *)request error:(NSError * _Nullable __autoreleasing *)error
@@ -494,9 +487,7 @@
             }
         }
     }
-    if (request.parseBlock) {
-        request.parsedData = request.parseBlock(request,self.parseLock);
-    }
+
     dispatch_async(dispatch_get_main_queue(), ^{
         if (request.isIndependentRequest) {
             if (request.requestAccessory && [request.requestAccessory respondsToSelector:@selector(requestWillStop:)]) {

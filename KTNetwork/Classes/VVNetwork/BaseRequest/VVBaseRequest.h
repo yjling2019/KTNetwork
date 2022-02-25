@@ -167,13 +167,6 @@ static NSString * const VVNetworkErrorDomain = @"VVNetworkError";
 
 - (void)startWithCompletionSuccess:(nullable void(^)(__kindof VVBaseRequest *request))successBlock
                            failure:(nullable void(^)(__kindof VVBaseRequest *request))failureBlock;
-/// start the request
-/// @param parseBlock the block used to parse response, exec not in mainThread
-/// @param successBlock successBlock
-/// @param failureBlock failureBlock
-- (void)startWithCompletionParse:(nullable id(^)(__kindof VVBaseRequest *request, NSRecursiveLock *lock))parseBlock
-                         success:(nullable void(^)(__kindof VVBaseRequest *request))successBlock
-                         failure:(nullable void(^)(__kindof VVBaseRequest *request))failureBlock;
 
 - (void)addRequestHeader:(NSDictionary <NSString *,NSString *>*)header;
 

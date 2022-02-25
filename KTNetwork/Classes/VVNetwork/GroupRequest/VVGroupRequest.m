@@ -247,13 +247,13 @@
         } else  if ([request isKindOfClass:[VVBaseRequest class]]) {
             @weakify(self);
             VVBaseRequest *baseRequest = (VVBaseRequest *)request;
-            [baseRequest startWithCompletionParse:baseRequest.parseBlock success:^(__kindof VVBaseRequest * _Nonnull request) {
-                @strongify(self);
-                [self handleSuccessOfRequest:request];
-            } failure:^(__kindof VVBaseRequest * _Nonnull request) {
-                @strongify(self);
-                [self handleFailureOfRequest:request];
-            }];
+			[baseRequest startWithCompletionSuccess:^(__kindof VVBaseRequest * _Nonnull request) {
+				@strongify(self);
+				[self handleSuccessOfRequest:request];
+			} failure:^(__kindof VVBaseRequest * _Nonnull request) {
+				@strongify(self);
+				[self handleFailureOfRequest:request];
+			}];
         } else if ([request isKindOfClass:[VVBatchRequest class]]) {
             VVBatchRequest *batchRequest = (VVBatchRequest *)request;
             @weakify(self);
@@ -480,14 +480,13 @@
             }];
         } else {
             @weakify(self);
-            [request startWithCompletionParse:request.parseBlock success:^(__kindof VVBaseRequest * _Nonnull request) {
+            [request startWithCompletionSuccess:^(__kindof VVBaseRequest * _Nonnull request) {
                 @strongify(self);
                 [self handleSuccessOfRequest:request];
             } failure:^(__kindof VVBaseRequest * _Nonnull request) {
                 @strongify(self);
                 [self handleFailureOfRequest:request];
             }];
-            
         }
     }
 }

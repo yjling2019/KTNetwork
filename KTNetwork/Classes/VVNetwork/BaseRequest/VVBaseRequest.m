@@ -24,21 +24,10 @@
 
 - (void)clearCompletionBlock
 {
-    if (self.parseBlock) {
-        self.parseBlock = nil;
-    }
-    if (self.successBlock) {
-        self.successBlock = nil;
-    }
-    if (self.failureBlock) {
-        self.failureBlock = nil;
-    }
-    if (self.successBlock) {
-        self.successBlock = nil;
-    }
-    if (self.failureBlock) {
-        self.failureBlock = nil;
-    }
+	self.successBlock = nil;
+	self.failureBlock = nil;
+	self.successBlock = nil;
+	self.failureBlock = nil;
 }
 
 - (void)start
@@ -97,14 +86,6 @@
 - (void)startWithCompletionSuccess:(nullable void(^)(__kindof VVBaseRequest *request))successBlock
                            failure:(nullable void(^)(__kindof VVBaseRequest *request))failureBlock
 {
-    [self startWithCompletionParse:nil success:successBlock failure:failureBlock];
-}
-
-- (void)startWithCompletionParse:(nullable id(^)(__kindof VVBaseRequest *request, NSRecursiveLock *lock))parseBlock
-                         success:(nullable void(^)(__kindof VVBaseRequest *request))successBlock
-                         failure:(nullable void(^)(__kindof VVBaseRequest *request))failureBlock
-{
-     self.parseBlock = parseBlock;
      self.successBlock = successBlock;
      self.failureBlock = failureBlock;
      [self start];

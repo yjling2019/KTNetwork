@@ -20,8 +20,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (atomic, strong, readwrite, nullable) NSError *error;
 
 @property (nonatomic, assign, readwrite) BOOL isDataFromCache;
-/// the parse block
-@property (nonatomic, copy, nullable) id(^parseBlock)(__kindof VVBaseRequest *request, NSRecursiveLock *lock);
 /// the request success block
 @property (nonatomic, copy, nullable) void(^successBlock)(__kindof VVBaseRequest *request);
 /// the request failure block
