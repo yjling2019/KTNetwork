@@ -10,6 +10,7 @@
 #import "TDScope.h"
 #import "VVBaseRequest+Private.h"
 #import "VVGroupRequest+Private.h"
+#import "VVBaseRequest+Group.h"
 
 @interface VVChainRequest()
 

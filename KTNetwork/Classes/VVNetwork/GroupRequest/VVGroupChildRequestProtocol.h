@@ -12,9 +12,6 @@
 
 @protocol VVGroupChildRequestProtocol <NSObject>
 
-/// the status of the request is not in a batchRequest or not in a chainRequest,default is YES
-@property (nonatomic, assign, readonly) BOOL isIndependentRequest;
-
 @property (nonatomic, weak, nullable) __kindof VVGroupRequest *groupRequest;
 
 /// the childRequest success block
@@ -23,6 +20,8 @@
 /// the childRequest failure block
 @property (nonatomic, copy, nullable) void(^failureBlock)(NSObject<VVGroupChildRequestProtocol> * _Nonnull request);
 
+/// the status of the request is not in a batchRequest or not in a chainRequest,default is YES
+- (BOOL)isIndependentRequest;
 /// complete the groupRequest(batchRequest or chainRequest) in advance,even if the groupRequest has requests not complete.
 - (void)inAdvanceCompleteGroupRequestWithResult:(BOOL)isSuccess;
 

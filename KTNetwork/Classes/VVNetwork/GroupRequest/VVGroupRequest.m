@@ -14,9 +14,9 @@
 
 @implementation VVGroupRequest
 
-@synthesize groupRequest;
-@synthesize successBlock;
-@synthesize failureBlock;
+@synthesize groupRequest = _groupRequest;
+@synthesize successBlock = _successBlock;
+@synthesize failureBlock = _failureBlock;
 
 - (instancetype)init
 {
@@ -93,7 +93,7 @@
 {
     if (self.groupRequest) {
         [self.groupRequest inAdvanceCompleteWithResult:isSuccess];
-    }else {
+    } else {
 #if DEBUG
         NSAssert(NO, @"self.groupRequest is nil");
 #endif
@@ -121,18 +121,10 @@
 
 - (void)clearCompletionBlock
 {
-    if (self.groupSuccessBlock) {
-        self.groupSuccessBlock = nil;
-    }
-    if (self.groupFailureBlock) {
-        self.groupFailureBlock = nil;
-    }
-    if (self.successBlock) {
-        self.successBlock = nil;
-    }
-    if (self.failureBlock) {
-        self.failureBlock = nil;
-    }
+	self.groupSuccessBlock = nil;
+	self.groupFailureBlock = nil;
+	self.successBlock = nil;
+	self.failureBlock = nil;
 }
 
 @end

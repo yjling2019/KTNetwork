@@ -11,6 +11,7 @@
 #import "VVBaseRequest+Private.h"
 #import "VVGroupRequest+Private.h"
 #import "VVChainRequest.h"
+#import "VVBaseRequest+Group.h"
 
 @interface VVBatchRequest()
 
@@ -19,7 +20,6 @@
 @end
 
 @implementation VVBatchRequest
-
 
 - (void)start
 {

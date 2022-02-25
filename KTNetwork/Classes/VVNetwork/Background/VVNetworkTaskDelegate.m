@@ -313,5 +313,4 @@ didCompleteWithError:(NSError *)error
     self.progress.completedUnitCount = fileOffset;
 }
 
-
 @end

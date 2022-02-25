@@ -27,7 +27,7 @@
 #pragma mark - - VVRequestInGroupProtocol - -
 - (BOOL)isIndependentRequest
 {
-	return self.groupRequest?NO:YES;
+	return self.groupRequest ? NO : YES;
 }
 
 - (void)inAdvanceCompleteGroupRequestWithResult:(BOOL)isSuccess
