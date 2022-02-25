@@ -16,6 +16,8 @@
 #import "VVMockManager.h"
 #import "VVBackgroundSessionManager.h"
 #import "TDScope.h"
+#import "VVBatchRequest.h"
+#import "VVChainRequest.h"
 
 @interface VVBaseRequest(VVNetworkAgent)
 

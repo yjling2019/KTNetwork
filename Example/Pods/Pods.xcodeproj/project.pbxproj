@@ -103,6 +103,13 @@
 		5BFF4F31AD167C8256DF656382E89012 /* KWGenericMatchEvaluator.h in Headers */ = {isa = PBXBuildFile; fileRef = 9A1040AA1D82034FEC6ECF06B681118C /* KWGenericMatchEvaluator.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5C6C99F70342BB36C5793E7C2B458C64 /* KWContainStringMatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = 519D8F349D5F3206A722B6EA59C367BF /* KWContainStringMatcher.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5DD7805A27C8B82100D26784 /* VVBaseRequest+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 5DD7805827C8B82100D26784 /* VVBaseRequest+Private.h */; };
+		5DD7806127C8C46300D26784 /* VVBatchRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 5DD7805F27C8C46300D26784 /* VVBatchRequest.h */; };
+		5DD7806227C8C46300D26784 /* VVBatchRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5DD7806027C8C46300D26784 /* VVBatchRequest.m */; };
+		5DD7806527C8C46D00D26784 /* VVChainRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 5DD7806327C8C46D00D26784 /* VVChainRequest.h */; };
+		5DD7806627C8C46D00D26784 /* VVChainRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5DD7806427C8C46D00D26784 /* VVChainRequest.m */; };
+		5DD7806927C8C4F300D26784 /* VVGroupRequest+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 5DD7806727C8C4F300D26784 /* VVGroupRequest+Private.h */; };
+		5DD7806D27C8C59B00D26784 /* VVBaseRequest+Group.h in Headers */ = {isa = PBXBuildFile; fileRef = 5DD7806B27C8C59B00D26784 /* VVBaseRequest+Group.h */; };
+		5DD7806E27C8C59B00D26784 /* VVBaseRequest+Group.m in Sources */ = {isa = PBXBuildFile; fileRef = 5DD7806C27C8C59B00D26784 /* VVBaseRequest+Group.m */; };
 		5F9A6B1F251E54709B343621609655C6 /* KWReporting.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A6CF013148E4439564C09B392FD9B19 /* KWReporting.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		604D3F76D9400BDEFBC6587EE6827933 /* KWBlock.m in Sources */ = {isa = PBXBuildFile; fileRef = AF557FD5A6755E030409377B8A11EEFF /* KWBlock.m */; };
 		634278532B85AB8514393C79C0F332B6 /* KWSymbolicator.m in Sources */ = {isa = PBXBuildFile; fileRef = 09874B4F225F2932A645B793D19A56FB /* KWSymbolicator.m */; };
@@ -416,6 +423,13 @@
 		5BA4F8B3E6EB0814411A2ACB0A2A3AF9 /* KWMessagePattern.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = KWMessagePattern.m; path = Classes/Core/KWMessagePattern.m; sourceTree = "<group>"; };
 		5C8588C2367573CD459C4A7167901932 /* KWExistVerifier.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = KWExistVerifier.h; path = Classes/Verifiers/KWExistVerifier.h; sourceTree = "<group>"; };
 		5DD7805827C8B82100D26784 /* VVBaseRequest+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "VVBaseRequest+Private.h"; sourceTree = "<group>"; };
+		5DD7805F27C8C46300D26784 /* VVBatchRequest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VVBatchRequest.h; sourceTree = "<group>"; };
+		5DD7806027C8C46300D26784 /* VVBatchRequest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VVBatchRequest.m; sourceTree = "<group>"; };
+		5DD7806327C8C46D00D26784 /* VVChainRequest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VVChainRequest.h; sourceTree = "<group>"; };
+		5DD7806427C8C46D00D26784 /* VVChainRequest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VVChainRequest.m; sourceTree = "<group>"; };
+		5DD7806727C8C4F300D26784 /* VVGroupRequest+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "VVGroupRequest+Private.h"; sourceTree = "<group>"; };
+		5DD7806B27C8C59B00D26784 /* VVBaseRequest+Group.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "VVBaseRequest+Group.h"; sourceTree = "<group>"; };
+		5DD7806C27C8C59B00D26784 /* VVBaseRequest+Group.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "VVBaseRequest+Group.m"; sourceTree = "<group>"; };
 		5E8AB9EC56DFF3F99917BB732CBD2D15 /* KWBeMemberOfClassMatcher.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = KWBeMemberOfClassMatcher.h; path = Classes/Matchers/KWBeMemberOfClassMatcher.h; sourceTree = "<group>"; };
 		5ED320FDA58ECA31C9D8CB47F529F3B4 /* KWStringUtilities.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = KWStringUtilities.m; path = Classes/Core/KWStringUtilities.m; sourceTree = "<group>"; };
 		5F0AFD687F03D01856FED5783EF66E67 /* AFSecurityPolicy.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = AFSecurityPolicy.h; path = AFNetworking/AFSecurityPolicy.h; sourceTree = "<group>"; };
@@ -939,8 +953,15 @@
 			isa = PBXGroup;
 			children = (
 				D894E06D31B21AC3B3EFA10FB5A1D25E /* VVGroupChildRequestProtocol.h */,
+				5DD7806727C8C4F300D26784 /* VVGroupRequest+Private.h */,
+				5DD7806B27C8C59B00D26784 /* VVBaseRequest+Group.h */,
+				5DD7806C27C8C59B00D26784 /* VVBaseRequest+Group.m */,
 				1A495098747CDDB7F5282E45D05BBD1C /* VVGroupRequest.h */,
 				D3AFBC049E22D24E8315334FAE72BECE /* VVGroupRequest.m */,
+				5DD7805F27C8C46300D26784 /* VVBatchRequest.h */,
+				5DD7806027C8C46300D26784 /* VVBatchRequest.m */,
+				5DD7806327C8C46D00D26784 /* VVChainRequest.h */,
+				5DD7806427C8C46D00D26784 /* VVChainRequest.m */,
 			);
 			path = GroupRequest;
 			sourceTree = "<group>";
@@ -1181,6 +1202,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				DCFC3BE367A9BDDF9D78FF91F686A8E6 /* KTNetwork-umbrella.h in Headers */,
+				5DD7806527C8C46D00D26784 /* VVChainRequest.h in Headers */,
+				5DD7806D27C8C59B00D26784 /* VVBaseRequest+Group.h in Headers */,
 				1D42079A02C7834FE018A58D1981D718 /* TDMetamacros.h in Headers */,
 				D7F45E13EADEB4BC27F1835E4C351C2E /* TDScope.h in Headers */,
 				B92E28D00FFB2ACCF73EFCA6370AF845 /* VVBackgroundSessionManager.h in Headers */,
@@ -1189,10 +1212,12 @@
 				0E255D314BA584FFB1689B5B92E5C1E7 /* VVMockManager.h in Headers */,
 				DA447FC9B6DBD9DCE8B233E0E4461EE4 /* VVMockURLProtocol.h in Headers */,
 				6395BA0BF2847ECEEE9F41B8CF105F71 /* VVNetwork.h in Headers */,
+				5DD7806927C8C4F300D26784 /* VVGroupRequest+Private.h in Headers */,
 				5DD7805A27C8B82100D26784 /* VVBaseRequest+Private.h in Headers */,
 				4F12F3FAC081435FAFF11F60B392F0C9 /* VVNetworkAgent.h in Headers */,
 				4509B68AA78C6D08422513F348126BF5 /* VVNetworkConfig.h in Headers */,
 				0CB888B37F60150B27927135134B1E51 /* VVNetworkResponse.h in Headers */,
+				5DD7806127C8C46300D26784 /* VVBatchRequest.h in Headers */,
 				AF12CF799C92C4EBE61870E690D6D555 /* VVNetworkTaskDelegate.h in Headers */,
 				0251D83B7C62941C41A97A9F41BD972F /* VVGroupChildRequestProtocol.h in Headers */,
 			);
@@ -1606,10 +1631,13 @@
 			files = (
 				68868AB7017ADB5684609BAEE48C9EDA /* KTNetwork-dummy.m in Sources */,
 				7CD22AA7B5C884A990068B2DCDC82D26 /* VVBackgroundSessionManager.m in Sources */,
+				5DD7806227C8C46300D26784 /* VVBatchRequest.m in Sources */,
 				C2E32B9F405677E2FF32D67270285439 /* VVBaseRequest.m in Sources */,
 				50162D0F9E45D23E4D27E64865A624B3 /* VVGroupRequest.m in Sources */,
 				283E589C696EACA046FD7DDF0B1FAA58 /* VVMockManager.m in Sources */,
+				5DD7806E27C8C59B00D26784 /* VVBaseRequest+Group.m in Sources */,
 				F360AF038E584713E2900AD4CBBAFED4 /* VVMockURLProtocol.m in Sources */,
+				5DD7806627C8C46D00D26784 /* VVChainRequest.m in Sources */,
 				9B439A4370387EF8A69C59E8127DA22D /* VVNetworkAgent.m in Sources */,
 				281C05958974A6E6D6D224AF5523EDC1 /* VVNetworkConfig.m in Sources */,
 				A10724A5EED91351114DBB49A000E7F7 /* VVNetworkResponse.m in Sources */,
