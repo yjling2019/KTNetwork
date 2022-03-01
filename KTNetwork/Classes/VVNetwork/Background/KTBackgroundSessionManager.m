@@ -164,7 +164,7 @@ static NSString * const kKTNetwork_background_task_identifier = @"kKTNetwork_bac
     BOOL canBeResumed = resumeDataFileExists && resumeData;
     NSURLSessionTask *sessionTask = nil;
     [self.lock lock];
-    if (request.backgroundPolicy == VVDownloadBackgroundRequire) {
+    if (request.backgroundPolicy == KTDownloadBackgroundRequire) {
         if (canBeResumed) {
             sessionTask = [self.backgroundURLSession downloadTaskWithResumeData:resumeData];
         } else {
@@ -199,7 +199,7 @@ static NSString * const kKTNetwork_background_task_identifier = @"kKTNetwork_bac
     NSArray <__kindof KTNetworkBaseDownloadTaskDelegate *>*delegates = [self.taskIdentifierAndDelegateDic allValues];
     [self.lock unlock];
     for (__kindof KTNetworkBaseDownloadTaskDelegate *delegate in delegates) {
-        if (delegate.request.backgroundPolicy == VVDownloadBackgroundDefault) {
+        if (delegate.request.backgroundPolicy == KTDownloadBackgroundDefault) {
             return YES;
         }
     }

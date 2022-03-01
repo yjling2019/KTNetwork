@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// the temp filepath of the download file
 @property (nonatomic, copy, nullable, readonly) NSString *tempFilePath;
 /// the background policy of the downloadRequest
-@property (nonatomic, assign) VVDownloadBackgroundPolicy backgroundPolicy;
+@property (nonatomic, assign) KTDownloadBackgroundPolicy backgroundPolicy;
 
 + (instancetype)new NS_UNAVAILABLE;
 

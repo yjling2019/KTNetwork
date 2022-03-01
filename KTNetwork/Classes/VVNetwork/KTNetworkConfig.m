@@ -48,7 +48,7 @@
 {
     if (!_incompleteCacheFolder) {
         NSString *cacheDir = NSTemporaryDirectory();
-        NSString *cacheFolder = [cacheDir stringByAppendingPathComponent:@"VVIncomplete"];
+        NSString *cacheFolder = [cacheDir stringByAppendingPathComponent:@"com.kotu.networking.incomplete"];
         NSFileManager *fileManager = [NSFileManager defaultManager];
         NSError *error = nil;
         if (![fileManager createDirectoryAtPath:cacheFolder withIntermediateDirectories:YES attributes:nil error:&error]) {
@@ -66,7 +66,7 @@
 {
     if (!_downloadFolderPath) {
         NSString *documentPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-       NSString *downloadFolder = [documentPath stringByAppendingPathComponent:@"KTNetworking_download"];
+       NSString *downloadFolder = [documentPath stringByAppendingPathComponent:@"com.kotu.networking.download"];
         NSFileManager *fileManager = [NSFileManager defaultManager];
         NSError *error = nil;
         if (![fileManager createDirectoryAtPath:downloadFolder withIntermediateDirectories:YES attributes:nil error:&error]) {

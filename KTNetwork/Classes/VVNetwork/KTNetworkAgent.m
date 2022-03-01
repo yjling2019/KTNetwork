@@ -47,27 +47,27 @@
     dispatch_queue_t _processingQueue;
 }
 
-@property (nonatomic, strong) NSMutableArray <__kindof KTBaseRequest *> *allStartedRequests;
-@property (nonatomic, strong) NSLock *lock;
-@property (nonatomic, strong) AFHTTPSessionManager *sessionManager;
-@property (nonatomic, strong) AFJSONResponseSerializer *jsonResponseSerializer;
-@property (nonatomic, strong) AFXMLParserResponseSerializer *xmlParserResponseSerialzier;
-
-/// the set of the request status
-@property (nonatomic, strong) NSIndexSet *allStatusCodes;
-/// the array of the batchRequest
-@property (nonatomic, strong) NSMutableArray *batchRequests;
-
-/// the array of the chainRequest
-@property (nonatomic, strong) NSMutableArray *chainRequests;
-
 /// the priority first request
 @property (nonatomic, strong, nullable) id priorityFirstRequest;
 
+/// the array of the batchRequest
+@property (nonatomic, strong) NSMutableArray *batchRequests;
+/// the array of the chainRequest
+@property (nonatomic, strong) NSMutableArray *chainRequests;
+
 /// the requests need after priprityFirstRequest fininsed,if the priprityFirstRequest is not nil,
 @property (nonatomic, strong, nonnull) NSMutableArray *bufferRequests;
+@property (nonatomic, strong) NSMutableArray <__kindof KTBaseRequest *> *allStartedRequests;
 
+/// the set of the request status
+@property (nonatomic, strong) NSIndexSet *allStatusCodes;
+
+@property (nonatomic, strong) AFHTTPSessionManager *sessionManager;
+@property (nonatomic, strong) AFJSONResponseSerializer *jsonResponseSerializer;
+@property (nonatomic, strong) AFXMLParserResponseSerializer *xmlParserResponseSerialzier;
 @property (nonatomic, strong, nonnull) KTBackgroundSessionManager *backgroundSessionMananger;
+
+@property (nonatomic, strong) NSLock *lock;
 
 @end
 

@@ -41,13 +41,13 @@ typedef NS_ENUM(NSInteger,KTNetworkErrorType) {
 	KTNetworkErrorInvalidJSONFormat,
 };
 
-typedef NS_ENUM(NSInteger,VVDownloadBackgroundPolicy) {
+typedef NS_ENUM(NSInteger,KTDownloadBackgroundPolicy) {
 	// if the download task not complete, it will apply to some minutes to download
-	VVDownloadBackgroundDefault = 0,
+	KTDownloadBackgroundDefault = 0,
 	// if the download task not complete,it forbidden to download at background
-	VVDownloadBackgroundForbidden,
+	KTDownloadBackgroundForbidden,
 	// if the download task not complete,it apply download at background until complete
-	VVDownloadBackgroundRequire,
+	KTDownloadBackgroundRequire,
 };
 
 static NSString * const KTNetworkErrorDomain = @"KTNetworkError";
