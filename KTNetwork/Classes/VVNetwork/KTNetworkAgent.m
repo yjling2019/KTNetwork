@@ -413,9 +413,11 @@ static dispatch_once_t onceToken;
     } else {
         [self requestDidFailWithRequest:request error:requestError];
     }
+	
     if ([[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(afterEachRequest:)]) {
         [[KTNetworkConfig sharedConfig].requestHelper afterEachRequest:request];
     }
+	
 #if DEBUG
     [self printRequestDescription:request];
 #endif
@@ -433,6 +435,7 @@ static dispatch_once_t onceToken;
     if ([request isKindOfClass:[KTBaseDownloadRequest class]]) {
         return YES;
     }
+	
     BOOL result = YES;
     id json = request.responseJSONObject;
     id validator = [request jsonValidator];
@@ -457,7 +460,8 @@ static dispatch_once_t onceToken;
 	@autoreleasepool {
 		BOOL needExtraHandle = [request requestSuccessPreHandle];
         if (needExtraHandle) {
-			if ([KTNetworkConfig sharedConfig].requestHelper && [[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(preHandleSuccessRequest:)]) {
+			if ([KTNetworkConfig sharedConfig].requestHelper &&
+				[[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(preHandleSuccessRequest:)]) {
 				[[KTNetworkConfig sharedConfig].requestHelper preHandleSuccessRequest:request];
             }
         }
@@ -465,18 +469,23 @@ static dispatch_once_t onceToken;
 
     dispatch_async(dispatch_get_main_queue(), ^{
         if (request.isIndependentRequest) {
-            if (request.requestAccessory && [request.requestAccessory respondsToSelector:@selector(requestWillStop:)]) {
+            if (request.requestAccessory &&
+				[request.requestAccessory respondsToSelector:@selector(requestWillStop:)]) {
                 [request.requestAccessory requestWillStop:request];
             }
         }
+		
         if (request.successBlock) {
             request.successBlock(request);
         }
-        if (request.isIndependentRequest) {
-            if (request.requestAccessory && [request.requestAccessory respondsToSelector:@selector(requestDidStop:)]) {
+        
+		if (request.isIndependentRequest) {
+            if (request.requestAccessory &&
+				[request.requestAccessory respondsToSelector:@selector(requestDidStop:)]) {
                 [request.requestAccessory requestDidStop:request];
             }
         }
+		
         [self judgeToStartBufferRequestsWithRequest:request];
     });
 }
@@ -496,18 +505,23 @@ static dispatch_once_t onceToken;
 	
     dispatch_async(dispatch_get_main_queue(), ^{
         if (request.isIndependentRequest) {
-			if (request.requestAccessory && [request.requestAccessory respondsToSelector:@selector(requestWillStop:)]) {
+			if (request.requestAccessory &&
+				[request.requestAccessory respondsToSelector:@selector(requestWillStop:)]) {
                 [request.requestAccessory requestWillStop:request];
             }
         }
+		
         if (request.failureBlock) {
             request.failureBlock(request);
         }
-        if (request.isIndependentRequest) {
-            if (request.requestAccessory && [request.requestAccessory respondsToSelector:@selector(requestDidStop:)]) {
+        
+		if (request.isIndependentRequest) {
+            if (request.requestAccessory &&
+				[request.requestAccessory respondsToSelector:@selector(requestDidStop:)]) {
                 [request.requestAccessory requestDidStop:request];
             }
         }
+		
         [self judgeToStartBufferRequestsWithRequest:request];
     });
 }

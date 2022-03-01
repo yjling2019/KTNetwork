@@ -63,10 +63,6 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param request request
 - (void)clearResponseFromCacheOfRequest:(__kindof KTBaseRequest *)request;
 
-/// according one api response to judge the request need to cache or not,and cacheTime
-/// @param request request
-- (void)judgeToChangeCachePolicy:(__kindof KTBaseRequest *)request;
-
 @end
 
 NS_ASSUME_NONNULL_END

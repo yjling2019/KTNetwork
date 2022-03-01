@@ -36,11 +36,6 @@
             [self.requestAccessory requestWillStart:self];
         }
     }
-    
-    if ([KTNetworkConfig sharedConfig].requestHelper
-        && [[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(judgeToChangeCachePolicy:)]) {
-        [[KTNetworkConfig sharedConfig].requestHelper judgeToChangeCachePolicy:self];
-    }
 	
     if (self.ignoreCache) {
         self.isDataFromCache = NO;
