@@ -7,6 +7,7 @@
 
 #import <Foundation/Foundation.h>
 #import <AFNetworking/AFHTTPSessionManager.h>
+#import "KTRequestProcessProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 @class KTBaseRequest,KTNetworkResponse;
@@ -57,15 +58,14 @@ static NSString * const KTNetworkErrorDomain = @"KTNetworkError";
 @optional
 
 + (void)requestWillStart:(id)request;
-
++ (void)requestDidStart:(id)request;
 + (void)requestWillStop:(id)request;
-
 + (void)requestDidStop:(id)request;
 
 @end
 
 
-@interface KTBaseRequest : NSObject
+@interface KTBaseRequest : NSObject <KTRequestProcessProtocol>
 
 #pragma mark - request
 /// the request apiName,fact is a path of url,it can contain path and query params
@@ -163,25 +163,19 @@ static NSString * const KTNetworkErrorDomain = @"KTNetworkError";
 /// the request baseurl of cdn it can contain host,port,and some path
 @property (nonatomic, copy, nullable) NSString *cdnBaseUrl;
 
-#pragma mark - handle
+#pragma mark - handler
 /// after request success before successBlock callback,do this func,if you want extra handle,return YES,else return NO
 - (BOOL)requestSuccessPreHandle;
 
 ///after request failure before successBlock callback,do this func,if you want extra handle,return YES,else return NO
 - (BOOL)requestFailurePreHandle;
 
-#pragma mark - operation
-- (void)start;
-
-- (void)stop;
-
-- (void)startWithCompletionSuccess:(nullable void(^)(__kindof KTBaseRequest *request))successBlock
-                           failure:(nullable void(^)(__kindof KTBaseRequest *request))failureBlock;
-
-- (void)clearCompletionBlock;
-
 #pragma mark - utils
 + (NSString *)makeCURLWithRequest:(NSURLRequest *)request;
+
+#pragma mark - operation
+- (void)startWithCompletionSuccess:(nullable void(^)(__kindof KTBaseRequest *request))successBlock
+						   failure:(nullable void(^)(__kindof KTBaseRequest *request))failureBlock;
 
 @end
 

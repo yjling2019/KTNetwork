@@ -19,23 +19,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)sharedAgent;
 
-- (void)addRequest:(__kindof KTBaseRequest *)request;
-
-- (void)cancelRequest:(__kindof KTBaseRequest *)request;
-
-- (void)cancelAllRequests;
-
-- (void)addBatchRequest:(__kindof KTBatchRequest *)request;
-
-- (void)removeBatchRequest:(__kindof KTBatchRequest *)request;
-
-- (void)addChainRequest:(__kindof KTChainRequest *)request;
-
-- (void)removeChainRequest:(__kindof KTChainRequest *)request;
-
 /// add the priority request,all the request will start until the prority request is finished
 /// @param request the request can ba a KTBaseRequest/KTBatchRequest/KTChainRequest
 - (void)addPriorityFirstRequest:(id)request;
+
+- (void)cancelAllRequests;
+
+- (void)startRequest:(id)request;
+- (void)cancelRequest:(id)request;
 
 /// all the requests
 - (NSArray <__kindof KTBaseRequest *>*)allRequests;

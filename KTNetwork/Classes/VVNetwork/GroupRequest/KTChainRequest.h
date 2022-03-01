@@ -15,8 +15,8 @@ typedef void(^KTChainRequestBlock)(KTChainRequest *chainRequest);
 
 @interface KTChainRequest : KTGroupRequest
 
-- (void)startWithCompletionSuccess:(nullable KTChainRequestBlock)successBlock
-						   failure:(nullable KTChainRequestBlock)failureBlock;
+//- (void)startWithCompletionSuccess:(nullable KTChainRequestBlock)successBlock
+//						   failure:(nullable KTChainRequestBlock)failureBlock;
 
 @end
 

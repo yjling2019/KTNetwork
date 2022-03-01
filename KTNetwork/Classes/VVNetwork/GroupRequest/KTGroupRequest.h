@@ -7,6 +7,7 @@
 
 #import <Foundation/Foundation.h>
 #import "KTBaseRequest.h"
+#import "KTRequestProcessProtocol.h"
 #import "KTGroupChildRequestProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -33,15 +34,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param requestArray requestArray
 - (void)addRequestsWithArray:(NSArray <id <KTGroupChildRequestProtocol>> *)requestArray;
 
-/// start current request
-- (void)start;
-
-/// stop current request
-- (void)stop;
-
-/// inadvance self with the result
-/// @param isSuccess the result
-- (void)inAdvanceCompleteWithResult:(BOOL)isSuccess;
+/// complete the groupRequest(batchRequest or chainRequest) in advance,even if the groupRequest has requests not complete.
+- (void)inAdvanceCompleteGroupRequestWithResult:(BOOL)isSuccess;
 
 @end
 

@@ -17,50 +17,91 @@
     self = [super init];
     if (self) {
         _requestTimeoutInterval = 15;
+		_requestSerializerType = KTRequestSerializerTypeHTTP;
+		_responseSerializerType = KTResponseSerializerTypeJSON;
+		_ignoreCache = YES;
     }
     return self;
 }
 
-- (void)clearCompletionBlock
+- (void)clearRequest
 {
-	self.successBlock = nil;
-	self.failureBlock = nil;
 	self.successBlock = nil;
 	self.failureBlock = nil;
 }
 
 - (void)start
 {
-    if (self.isIndependentRequest) {
-        if (self.requestAccessory && [self.requestAccessory respondsToSelector:@selector(requestWillStart:)]) {
-            [self.requestAccessory requestWillStart:self];
-        }
-    }
+	[self willStart];
 	
-    if (self.ignoreCache) {
+    if (self.ignoreCache || ![self readResponseFromCache]) {
         self.isDataFromCache = NO;
-        [[KTNetworkAgent sharedAgent] addRequest:self];
+        [[KTNetworkAgent sharedAgent] startRequest:self];
         return;
     }
-    
-    if (![self readResponseFromCache]) {
-        self.isDataFromCache = NO;
-        [[KTNetworkAgent sharedAgent] addRequest:self];
-        return;
-    }
-    
+  
     self.isDataFromCache = YES;
     dispatch_async(dispatch_get_main_queue(), ^{
+		[self willFinished];
         if (self.successBlock) {
             self.successBlock(self);
         }
-        [self clearCompletionBlock];
+		[self clearRequest];
+		[self didFinished];
     });
+}
+
+- (void)realyStart
+{
+	[self.requestTask resume];
+	[self didStart];
+}
+
+- (void)cancel
+{
+	[self stop];
+	[self clearRequest];
+}
+
+- (void)willStart
+{
+	if (self.isIndependentRequest &&
+		self.requestAccessory &&
+		[self.requestAccessory respondsToSelector:@selector(requestWillStart:)]) {
+		[self.requestAccessory requestWillStart:self];
+	}
+}
+
+- (void)didStart
+{
+	if (self.isIndependentRequest &&
+		self.requestAccessory &&
+		[self.requestAccessory respondsToSelector:@selector(requestDidStart:)]) {
+		[self.requestAccessory requestDidStart:self];
+	}
 }
 
 - (void)stop
 {
     [[KTNetworkAgent sharedAgent] cancelRequest:self];
+}
+
+- (void)willFinished
+{
+	if (self.isIndependentRequest &&
+		self.requestAccessory &&
+		[self.requestAccessory respondsToSelector:@selector(requestWillStop:)]) {
+		[self.requestAccessory requestWillStop:self];
+	}
+}
+
+- (void)didFinished
+{	
+	if (self.isIndependentRequest &&
+		self.requestAccessory &&
+		[self.requestAccessory respondsToSelector:@selector(requestDidStop:)]) {
+		[self.requestAccessory requestDidStop:self];
+	}
 }
 
 - (BOOL)requestSuccessPreHandle
@@ -78,7 +119,7 @@
 }
 
 - (void)startWithCompletionSuccess:(nullable void(^)(__kindof KTBaseRequest *request))successBlock
-                           failure:(nullable void(^)(__kindof KTBaseRequest *request))failureBlock
+						   failure:(nullable void(^)(__kindof KTBaseRequest *request))failureBlock
 {
      self.successBlock = successBlock;
      self.failureBlock = failureBlock;

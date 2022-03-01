@@ -15,6 +15,7 @@
 @implementation KTGroupRequest
 
 @synthesize groupRequest = _groupRequest;
+
 @synthesize successBlock = _successBlock;
 @synthesize failureBlock = _failureBlock;
 
@@ -28,6 +29,7 @@
     return self;
 }
 
+#pragma mark - public
 - (void)addRequest:(id <KTGroupChildRequestProtocol>)request
 {
     if (![request conformsToProtocol:@protocol(KTGroupChildRequestProtocol)]) {
@@ -68,22 +70,128 @@
     }
 }
 
+#pragma mark - private
+- (void)finishAllRequestsWithSuccessBlock
+{
+	[self willFinished];
+	if (self.successBlock) {
+		self.successBlock(self);
+	}
+	
+	[self stop];
+	[self clearRequest];
+	[self didFinished];
+}
+
+- (void)finishAllRequestsWithFailureBlock
+{
+	[self willFinished];
+	if (self.failureBlock) {
+		self.failureBlock(self);
+	}
+	
+	[self stop];
+	[self clearRequest];
+	[self didFinished];
+}
+
+#pragma mark - KTRequestProcessProtocol
 - (void)start
 {
-    
+	if (self.requestArray.count == 0) {
+		return;
+	}
+	
+	if (self.executing) {
+		return;
+	}
+	
+	[self willStart];
+	[[KTNetworkAgent sharedAgent] startRequest:self];
+}
+
+- (void)startWithCompletionSuccess:(nullable KTRequestProcessBlock)successBlock
+						   failure:(nullable KTRequestProcessBlock)failureBlock
+{
+	self.successBlock = successBlock;
+	self.failureBlock = failureBlock;
+	[self start];
+}
+
+- (void)cancel
+{
+	[self stop];
+	[self clearRequest];
+}
+
+- (void)realyStart
+{
+}
+
+- (void)willStart
+{
+	self.inAdvanceCompleted = NO;
+	self.executing = YES;
+	
+	if (self.isIndependentRequest &&
+		self.requestAccessory &&
+		[self.requestAccessory respondsToSelector:@selector(requestWillStart:)]) {
+		[self.requestAccessory requestWillStart:self];
+	}
+}
+
+- (void)didStart
+{
+	if (self.isIndependentRequest &&
+		self.requestAccessory &&
+		[self.requestAccessory respondsToSelector:@selector(requestDidStart:)]) {
+		[self.requestAccessory requestDidStart:self];
+	}
 }
 
 - (void)stop
 {
-    
+	for (__kindof KTBaseRequest *baseRequest in [self.requestArray copy]) {
+		[baseRequest stop];
+	}
+	[[KTNetworkAgent sharedAgent] cancelRequest:self];
 }
 
+- (void)willFinished
+{
+	if (self.isIndependentRequest &&
+		self.requestAccessory &&
+		[self.requestAccessory respondsToSelector:@selector(requestWillStop:)]) {
+		[self.requestAccessory requestWillStop:self];
+	}
+}
+
+- (void)didFinished
+{
+	if (self.isIndependentRequest &&
+		self.requestAccessory &&
+		[self.requestAccessory respondsToSelector:@selector(requestDidStop:)]) {
+		[self.requestAccessory requestDidStop:self];
+	}
+}
+
+- (void)clearRequest
+{
+	self.successBlock = nil;
+	self.failureBlock = nil;
+	
+	self.finishedCount = 0;
+	self.failedRequests = nil;
+	self.executing = NO;
+}
+
+#pragma mark - KTGroupChildRequestProtocol
 - (void)inAdvanceCompleteWithResult:(BOOL)isSuccess
 {
     
 }
 
-#pragma mark - - KTRequestInGroupProtocol - -
+#pragma mark - KTRequestInGroupProtocol 
 - (BOOL)isIndependentRequest
 {
     return self.groupRequest?NO:YES;
@@ -94,33 +202,6 @@
     if (self.groupRequest) {
         [self.groupRequest inAdvanceCompleteWithResult:isSuccess];
     }
-}
-
-- (void)handleAccessoryWithBlock:(void(^)(void))block
-{
-    if (self.isIndependentRequest) {
-        if (self.requestAccessory
-            && [self.requestAccessory respondsToSelector:@selector(requestWillStop:)]) {
-            [self.requestAccessory requestWillStop:self];
-        }
-    }
-    if (block) {
-        block();
-    }
-    if (self.isIndependentRequest) {
-        if (self.requestAccessory
-            && [self.requestAccessory respondsToSelector:@selector(requestDidStop:)]) {
-            [self.requestAccessory requestDidStop:self];
-        }
-    }
-}
-
-- (void)clearCompletionBlock
-{
-	self.groupSuccessBlock = nil;
-	self.groupFailureBlock = nil;
-	self.successBlock = nil;
-	self.failureBlock = nil;
 }
 
 @end

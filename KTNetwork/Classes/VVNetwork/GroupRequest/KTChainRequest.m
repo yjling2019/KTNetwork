@@ -23,64 +23,28 @@
 
 @implementation KTChainRequest
 
-- (void)start
+- (void)clearRequest
 {
-	self.inAdvanceCompleted = NO;
-	if (self.requestArray.count == 0) {
-#if DEBUG
-		NSAssert(NO, @"please makesure self.requestArray.count > 0");
-#endif
-		return;
-	}
-	if (self.executing) {
-		return;
-	}
-	self.executing = YES;
-	if ([self.requestArray count] > 0) {
-		if (self.requestAccessory  && [self.requestAccessory respondsToSelector:@selector(requestWillStart:)]) {
-			[self.requestAccessory requestWillStart:self];
-		}
-		[self startNextRequest];
-	}
-}
-
-- (void)stop
-{
-	[self clearCompletionBlock];
-	self.finishedCount = 0;
-	self.failedRequests = nil;
+	[super clearRequest];
 	self.lastRequest = nil;
-	[[KTNetworkAgent sharedAgent] removeChainRequest:self];
-	self.executing = NO;
 }
 
-- (void)startWithCompletionSuccess:(nullable void (^)(KTChainRequest *chainRequest))successBlock
-						   failure:(nullable void (^)(KTChainRequest *chainRequest))failureBlock
+- (void)realyStart
 {
-	self.groupSuccessBlock = successBlock;
-	self.groupFailureBlock = failureBlock;
-	[[KTNetworkAgent sharedAgent] addChainRequest:self];
+	[self startNextRequest];
 }
 
 - (void)inAdvanceCompleteWithResult:(BOOL)isSuccess
 {
 	self.inAdvanceCompleted = YES;
 	if (isSuccess) {
-		[self handleAccessoryWithBlock:^{
-			if (self.groupSuccessBlock) {
-				self.groupSuccessBlock(self);
-			}
-		}];
+		[self finishAllRequestsWithSuccessBlock];
 	} else {
-		[self handleAccessoryWithBlock:^{
-			if (self.groupFailureBlock) {
-				self.groupFailureBlock(self);
-			}
-		}];
+		[self finishAllRequestsWithFailureBlock];
 	}
-	[self stop];
 }
 
+#pragma mark - finish handle
 - (void)startNextRequest
 {
 	if (self.canStartNextRequest) {
@@ -106,14 +70,14 @@
 				@strongify(self);
 				[self handleFailureOfRequest:request];
 			}];
-		} else {
+		} else if ([request isKindOfClass:[KTBaseRequest class]]) {
 			@weakify(self);
-			[request startWithCompletionSuccess:^(__kindof KTBaseRequest * _Nonnull request) {
+			[request startWithCompletionSuccess:^(id <KTRequestProcessProtocol> request) {
 				@strongify(self);
-				[self handleSuccessOfRequest:request];
-			} failure:^(__kindof KTBaseRequest * _Nonnull request) {
+				[self handleSuccessOfRequest:(KTBaseRequest *)request];
+			} failure:^(id <KTRequestProcessProtocol> request) {
 				@strongify(self);
-				[self handleFailureOfRequest:request];
+				[self handleFailureOfRequest:(KTBaseRequest *)request];
 			}];
 		}
 	}
@@ -131,12 +95,7 @@
 	if (self.canStartNextRequest) {
 		[self startNextRequest];
 	} else {
-		[self handleAccessoryWithBlock:^{
-			if (self.groupSuccessBlock) {
-				self.groupSuccessBlock(self);
-			}
-		}];
-		[self stop];
+		[self finishAllRequestsWithSuccessBlock];
 	}
 }
 
@@ -156,15 +115,10 @@
 	for (id <KTGroupChildRequestProtocol> tmpRequest in [self.requestArray copy]) {
 		[tmpRequest stop];
 	}
-	[self handleAccessoryWithBlock:^{
-		if (self.groupFailureBlock) {
-			self.groupFailureBlock(self);
-		}
-	}];
-	[self stop];
+	[self finishAllRequestsWithFailureBlock];
 }
 
-#pragma mark - - getter - -
+#pragma mark - getter
 - (BOOL)canStartNextRequest
 {
 	return self.finishedCount < [self.requestArray count] && !self.inAdvanceCompleted;

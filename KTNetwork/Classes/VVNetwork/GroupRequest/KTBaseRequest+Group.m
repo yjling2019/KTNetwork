@@ -34,10 +34,11 @@ static char const *const kGroupRequest ="com.kotu.network.groupRequest";
 
 - (void)inAdvanceCompleteGroupRequestWithResult:(BOOL)isSuccess
 {
-	if (!self.groupRequest) {
-		return;
-	}
-	[self.groupRequest inAdvanceCompleteWithResult:isSuccess];
+#warning TODO 0301
+//	if (!self.groupRequest) {
+//		return;
+//	}
+//	[self.groupRequest inAdvanceCompleteWithResult:isSuccess];
 }
 
 @end

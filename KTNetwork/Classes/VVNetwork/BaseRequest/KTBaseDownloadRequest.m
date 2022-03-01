@@ -48,7 +48,7 @@
 	self.successBlock = successBlock;
 	self.failureBlock = failureBlock;
 	self.progressBlock = downloadProgressBlock;
-	[[KTNetworkAgent sharedAgent] addRequest:self];
+	[[KTNetworkAgent sharedAgent] startRequest:self];
 }
 
 #pragma mark - - getter - -

@@ -23,9 +23,6 @@ typedef void(^KTBatchRequestBlock)(KTBatchRequest *batchRequest);
  */
 - (void)configRequireSuccessRequests:(nullable NSArray <__kindof NSObject <KTGroupChildRequestProtocol> *> *)requests;
 
-- (void)startWithCompletionSuccess:(nullable KTBatchRequestBlock)successBlock
-						   failure:(nullable KTBatchRequestBlock)failureBlock;
-
 @end
 
 NS_ASSUME_NONNULL_END

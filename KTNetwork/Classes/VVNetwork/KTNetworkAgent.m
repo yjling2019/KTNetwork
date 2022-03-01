@@ -108,19 +108,43 @@ static dispatch_once_t onceToken;
     return self;
 }
 
-- (void)addRequest:(__kindof KTBaseRequest *)request
+- (void)startRequest:(id)request
+{
+	if (!request) {
+		return;
+	}
+	
+	if ([request isKindOfClass:[KTBaseRequest class]]) {
+		[self startBaseRequest:request];
+	} else if ([request isKindOfClass:[KTBatchRequest class]]) {
+		[self startBatchRequest:request];
+	} else if ([request isKindOfClass:[KTChainRequest class]]) {
+		[self startChainRequest:request];
+	}
+}
+
+- (void)cancelRequest:(id)request
+{
+	if (!request) {
+		return;
+	}
+	
+	if ([request isKindOfClass:[KTBaseRequest class]]) {
+		[self cancelBaseRequest:request];
+	} else if ([request isKindOfClass:[KTBatchRequest class]]) {
+		[self removeBatchRequest:request];
+	} else if ([request isKindOfClass:[KTChainRequest class]]) {
+		[self removeChainRequest:request];
+	}
+}
+
+- (void)startBaseRequest:(__kindof KTBaseRequest *)request
 {
     if (!request) {
-#if DEBUG
-        NSAssert(NO, @"request can't be nil");
-#endif
         return;
     }
     
     if (![request isKindOfClass:[KTBaseRequest class]]) {
-#if DEBUG
-        NSAssert(NO, @"please makesure [request isKindOfClass:[KTBaseRequest class]] be YES");
-#endif
         return;
     }
 	
@@ -166,26 +190,20 @@ static dispatch_once_t onceToken;
 		[self.lock unlock];
     }
 	
-    [request.requestTask resume];
+	[request realyStart];
 }
 
-- (void)cancelRequest:(__kindof KTBaseRequest *)request
+- (void)cancelBaseRequest:(__kindof KTBaseRequest *)request
 {
     if (!request) {
-#if DEBUG
-        NSAssert(NO, @"request can't be nil");
-#endif
         return;
     }
+	
     if (![request isKindOfClass:[KTBaseRequest class]]) {
-#if DEBUG
-        NSAssert(NO, @"please makesure [request isKindOfClass:[KTBaseRequest class]] be YES");
-#endif
         return;
     }
 	
     if (![self.allStartedRequests containsObject:request]) {
-        [request clearCompletionBlock];
         return;
     }
 	
@@ -198,396 +216,15 @@ static dispatch_once_t onceToken;
     [self.lock lock];
     [self.allStartedRequests removeObject:request];
     [self.lock unlock];
-    [request clearCompletionBlock];
 }
 
-- (void)cancelAllRequests
-{
-    if (self.priorityFirstRequest) {
-        if ([self.priorityFirstRequest isKindOfClass:[KTBaseRequest class]]) {
-            KTBaseRequest *request = (KTBaseRequest *)self.priorityFirstRequest;
-            [request stop];
-        } else if ([self.priorityFirstRequest isKindOfClass:[KTBatchRequest class]]) {
-            KTBatchRequest *request = (KTBatchRequest *)self.priorityFirstRequest;
-            [request stop];
-        } else if ([self.priorityFirstRequest isKindOfClass:[KTChainRequest class]]) {
-            KTChainRequest *request = (KTChainRequest *)self.priorityFirstRequest;
-            [request stop];
-        }
-    }
-    
-    [self.lock lock];
-    [self.batchRequests removeAllObjects];
-    [self.chainRequests removeAllObjects];
-    [self.bufferRequests removeAllObjects];
-    [self.lock unlock];
-    
-    [self.lock lock];
-    NSArray *allStartedRequests = [self.allStartedRequests copy];
-    [self.lock unlock];
-    
-    for (__kindof KTBaseRequest *request in allStartedRequests) {
-        [request stop];
-    }
-}
-
-- (NSURLSessionTask *)sessionTaskForRequest:(__kindof KTBaseRequest *)request error:(NSError * _Nullable __autoreleasing *)error
-{
-    NSString *url = nil;
-    id param = nil;
-    if (request.useSignature) {
-        if ([request customSignature]) {
-            url = request.signaturedUrl;
-            param = request.signaturedParams;
-        } else {
-            if ([[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(signatureRequest:)]) {
-                [[KTNetworkConfig sharedConfig].requestHelper signatureRequest:request];
-                url = request.signaturedUrl;
-                param = request.signaturedParams;
-            } else {
-                NSError *signatureError = [NSError errorWithDomain:KTNetworkErrorDomain code:KTNetworkErrorNotSupportSignature userInfo:@{@"msg":@"the requestHelper do not implement selecotr signatureRequest:"}];
-                signatureError = *error;
-                return nil;
-            }
-        }
-    } else {
-        url = [self buildRequestUrl:request];
-        param = request.requestArgument;
-    }
-    
-    if ([KTNetworkConfig sharedConfig].isMock) {
-        BOOL needMock = [VVMockManager matchRequest:request url:url];
-        if (needMock) {
-            NSURL *Url = [NSURL URLWithString:url];
-            NSString *scheme = Url.scheme;
-            NSString *host = Url.host;
-            NSNumber *port = Url.port;
-            NSString *domain = nil;
-            if (port) {
-				domain = [NSString stringWithFormat:@"%@://%@:%@",scheme,host,port];
-            } else {
-				domain = [NSString stringWithFormat:@"%@://%@",scheme,host];
-            }
-           url = [url stringByReplacingOccurrencesOfString:domain withString:[KTNetworkConfig sharedConfig].mockBaseUrl];
-        }
-    }
-    
-    AFHTTPRequestSerializer *requestSerializer = [self requestSerializerForRequest:request];
-    if ([request isKindOfClass:[KTBaseDownloadRequest class]]) {
-        return [self downloadTaskWithRequest:(KTBaseDownloadRequest *)request requestSerializer:requestSerializer URLString:url parameters:param error:error];
-    } else if ([request isKindOfClass:[KTBaseUploadRequest class]]) {
-        return [self uploadTaskWithRequest:request requestSerializer:requestSerializer URLString:url parameters:param error:error];
-	} else {
-		return [self dataTaskWithRequest:request requestSerializer:requestSerializer URLString:url parameters:param error:error];
-	}
-}
-
-- (NSURLSessionTask *)downloadTaskWithRequest:(__kindof KTBaseDownloadRequest *)request
-                            requestSerializer:(AFHTTPRequestSerializer *)requestSerializer
-                                    URLString:(NSString *)URLString
-                                    parameters:(id)parameters
-                                         error:(NSError * _Nullable __autoreleasing *)error
-{
-   __block NSURLSessionTask *dataTask = [self.backgroundSessionMananger dataTaskWithDownloadRequest:request requestSerializer:requestSerializer URLString:URLString parameters:parameters progress:request.progressBlock completionHandler:^(NSURLResponse * _Nonnull response, NSError * _Nullable error) {
-        [self handleResultWithRequest:request error:error];
-    } error:error];
-    return dataTask;
-}
-
-- (NSURLSessionDataTask *)uploadTaskWithRequest:(__kindof KTBaseUploadRequest *)request
-                                requestSerializer:(AFHTTPRequestSerializer *)requestSerializer
-                                        URLString:(NSString *)URLString
-                                       parameters:(id)parameters
-                                            error:(NSError * _Nullable __autoreleasing *)error
-{
-    NSMutableURLRequest *urlRequest = [requestSerializer multipartFormRequestWithMethod:@"POST" URLString:URLString parameters:parameters constructingBodyWithBlock:request.formDataBlock error:error];
-    __block NSURLSessionDataTask *dataTask = [self.sessionManager dataTaskWithRequest:urlRequest uploadProgress:request.progressBlock downloadProgress:nil completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
-        request.responseObject = responseObject;
-        [self handleResultWithRequest:request error:error];
-    }];
-    request.requestTask = dataTask;
-    return dataTask;
-}
-
-- (NSURLSessionDataTask *)dataTaskWithRequest:(__kindof KTBaseRequest *)request
-                            requestSerializer:(AFHTTPRequestSerializer *)requestSerializer
-                                    URLString:(NSString *)URLString
-                                   parameters:(id)parameters
-                                        error:(NSError * _Nullable __autoreleasing *)error
-{
-    NSString *method = nil;
-    switch (request.requestMethod) {
-        case KTRequestMethodGET:
-        {
-            method = @"GET";
-        }
-            break;
-        case KTRequestMethodPOST:
-        {
-            method = @"POST";
-        }
-            break;
-        case KTRequestMethodHEAD:
-        {
-            method = @"HEAD";
-        }
-            break;
-        case KTRequestMethodPUT:
-        {
-            method = @"PUT";
-        }
-            break;
-        case KTRequestMethodDELETE:
-        {
-            method = @"DELETE";
-        }
-            break;
-        case KTRequestMethodPATCH:
-        {
-            method = @"PATCH";
-        }
-            break;
-        default:
-            break;
-    }
-    NSMutableURLRequest *urlRequest = [requestSerializer requestWithMethod:method URLString:URLString parameters:parameters error:error];
-    __block NSURLSessionDataTask *dataTask = [self.sessionManager dataTaskWithRequest:urlRequest uploadProgress:nil downloadProgress:nil completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
-        request.responseObject = responseObject;
-        [self handleResultWithRequest:request error:error];
-    }];
-    return dataTask;
-}
-
-- (void)handleResultWithRequest:(__kindof KTBaseRequest *)request error:(NSError *)error
+- (void)startBatchRequest:(__kindof KTBatchRequest *)request
 {
     if (!request) {
-        return;
-    }
-    NSError *__autoreleasing serializationError = nil;
-    NSError *__autoreleasing validationError = nil;
-    NSError *requestError = nil;
-    BOOL succeed = NO;
-    
-    if (![request isKindOfClass:[KTBaseDownloadRequest class]]) {
-		NSData *responseData = nil;
-		if ([request.responseObject isKindOfClass:[NSData class]]) {
-			responseData = (NSData *)request.responseObject;
-		}
-		switch (request.responseSerializerType) {
-			case KTResponseSerializerTypeHTTP:
-	//            defalut serializer. do nothing
-				break;
-				
-			case KTResponseSerializerTypeJSON: {
-				request.responseObject = [self.jsonResponseSerializer responseObjectForResponse:request.requestTask.response data:responseData error:&serializationError];
-				request.responseJSONObject = request.responseObject;
-			}
-				break;
-			
-			case KTResponseSerializerTypeXMLParser: {
-				request.responseObject = [self.xmlParserResponseSerialzier responseObjectForResponse:request.requestTask.response data:responseData error:&serializationError];
-			}
-				break;
-				
-			default:
-				break;
-		}
-    }
-    
-    if (error) {
-        succeed = NO;
-        requestError = error;
-    } else if (serializationError) {
-        succeed = NO;
-        requestError = serializationError;
-    } else {
-        if (request.responseSerializerType == KTResponseSerializerTypeHTTP
-            || request.responseSerializerType == KTResponseSerializerTypeJSON) {
-            succeed = [self validateResult:request error:&validationError];
-            requestError = validationError;
-        }
-    }
-
-    if (succeed) {
-        [self requestDidSucceedWithRequest:request];
-    } else {
-        [self requestDidFailWithRequest:request error:requestError];
-    }
-	
-    if ([[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(afterEachRequest:)]) {
-        [[KTNetworkConfig sharedConfig].requestHelper afterEachRequest:request];
-    }
-	
-#if DEBUG
-    [self printRequestDescription:request];
-#endif
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.lock lock];
-        [self.allStartedRequests removeObject:request];
-        [self.lock unlock];
-        [request clearCompletionBlock];
-    });
-}
-
-- (BOOL)validateResult:(__kindof KTBaseRequest *)request error:(NSError * _Nullable __autoreleasing *)error
-{
-    if ([request isKindOfClass:[KTBaseDownloadRequest class]]) {
-        return YES;
-    }
-	
-    BOOL result = YES;
-    id json = request.responseJSONObject;
-    id validator = [request jsonValidator];
-    if (json && validator) {
-		result = [self validateJSON:json withValidator:validator];
-        if (!result) {
-            NSError *tmpError = [[NSError alloc] initWithDomain:KTNetworkErrorDomain code:KTNetworkErrorInvalidJSONFormat userInfo:@{NSLocalizedDescriptionKey:@"validateResult failed",@"extra":request.responseJSONObject?:@{}}];
-            if (error != NULL) {
-				*error = tmpError;
-            }
-        }
-    } else if (!json) {
-#if DEBUG
-        NSAssert(NO, @"responseJSONObject can't be nil");
-#endif
-    }
-    return result;
-}
-
-- (void)requestDidSucceedWithRequest:(__kindof KTBaseRequest *)request
-{
-	@autoreleasepool {
-		BOOL needExtraHandle = [request requestSuccessPreHandle];
-        if (needExtraHandle) {
-			if ([KTNetworkConfig sharedConfig].requestHelper &&
-				[[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(preHandleSuccessRequest:)]) {
-				[[KTNetworkConfig sharedConfig].requestHelper preHandleSuccessRequest:request];
-            }
-        }
-    }
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (request.isIndependentRequest) {
-            if (request.requestAccessory &&
-				[request.requestAccessory respondsToSelector:@selector(requestWillStop:)]) {
-                [request.requestAccessory requestWillStop:request];
-            }
-        }
-		
-        if (request.successBlock) {
-            request.successBlock(request);
-        }
-        
-		if (request.isIndependentRequest) {
-            if (request.requestAccessory &&
-				[request.requestAccessory respondsToSelector:@selector(requestDidStop:)]) {
-                [request.requestAccessory requestDidStop:request];
-            }
-        }
-		
-        [self judgeToStartBufferRequestsWithRequest:request];
-    });
-}
-
-- (void)requestDidFailWithRequest:(__kindof KTBaseRequest *)request error:(NSError *)error
-{
-    request.error = error;
-	
-    @autoreleasepool {
-       BOOL needExtraHandle = [request requestFailurePreHandle];
-        if (needExtraHandle) {
-            if ([KTNetworkConfig sharedConfig].requestHelper && [[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(preHandleFailureRequest:)]) {
-                [[KTNetworkConfig sharedConfig].requestHelper preHandleFailureRequest:request];
-            }
-        }
-    }
-	
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (request.isIndependentRequest) {
-			if (request.requestAccessory &&
-				[request.requestAccessory respondsToSelector:@selector(requestWillStop:)]) {
-                [request.requestAccessory requestWillStop:request];
-            }
-        }
-		
-        if (request.failureBlock) {
-            request.failureBlock(request);
-        }
-        
-		if (request.isIndependentRequest) {
-            if (request.requestAccessory &&
-				[request.requestAccessory respondsToSelector:@selector(requestDidStop:)]) {
-                [request.requestAccessory requestDidStop:request];
-            }
-        }
-		
-        [self judgeToStartBufferRequestsWithRequest:request];
-    });
-}
-
-- (NSString *)buildRequestUrl:(__kindof KTBaseRequest *)request
-{
-    NSString *urlStr = [request buildCustomRequestUrl];
-    if (!urlStr || (urlStr && [urlStr isKindOfClass:[NSString class]] && urlStr.length == 0)) {
-        NSString *detailUrl = [request requestUrl];
-        
-        if ([[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(filterUrl:withRequest:)]) {
-			detailUrl = [[KTNetworkConfig sharedConfig].requestHelper filterUrl:detailUrl withRequest:request];
-        }
-        
-        NSString *baseUrl = @"";
-        if ([request useCDN]) {
-            if (request.cdnBaseUrl.length > 0) {
-                baseUrl = request.cdnBaseUrl;
-            } else {
-                if ([[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(baseUrlOfRequest:)]) {
-                     baseUrl = [[KTNetworkConfig sharedConfig].requestHelper baseUrlOfRequest:request];
-                } else {
-                    baseUrl = [KTNetworkConfig sharedConfig].cdnBaseUrl;
-                }
-            }
-        } else {
-            if (request.baseUrl.length > 0) {
-                baseUrl = request.baseUrl;
-            } else {
-                if ([[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(baseUrlOfRequest:)]) {
-                     baseUrl = [[KTNetworkConfig sharedConfig].requestHelper baseUrlOfRequest:request];
-                } else {
-                     baseUrl = [KTNetworkConfig sharedConfig].baseUrl;
-                }
-            }
-        }
-        if (baseUrl.length == 0) {
-#if DEBUG
-            NSAssert(NO, @"please make sure baseUrl.length > 0 be YES!");
-#endif
-        }
-        NSURL *url = [NSURL URLWithString:baseUrl];
-        if (baseUrl.length > 0 && ![baseUrl hasSuffix:@"/"]) {
-            url = [url URLByAppendingPathComponent:@""];
-        }
-        if (![[url path] isEqualToString:@"/"]) {
-			detailUrl = [NSString stringWithFormat:@"%@%@",[url path],detailUrl];
-        }
-        urlStr = [NSURL URLWithString:detailUrl relativeToURL:url].absoluteString;
-    }
-    return urlStr;
-}
-
-- (void)addBatchRequest:(__kindof KTBatchRequest *)request
-{
-    if (!request) {
-#if DEBUG
-        NSAssert(NO, @"request can't be nil");
-#endif
         return;
     }
 	
     if (![request isKindOfClass:[KTBatchRequest class]]) {
-#if DEBUG
-        NSAssert(NO, @"please makesure [request isKindOfClass:[KTBatchRequest class]] be YES");
-#endif
         return;
     }
 	
@@ -609,46 +246,34 @@ static dispatch_once_t onceToken;
             [self.batchRequests addObject:request];
         }
         [self.lock unlock];
-        [request start];
+        [request realyStart];
     }
 }
 
 - (void)removeBatchRequest:(__kindof KTBatchRequest *)request
 {
     if (!request) {
-#if DEBUG
-        NSAssert(NO, @"request can't be nil");
-#endif
         return;
     }
+	
     if (![request isKindOfClass:[KTBatchRequest class]]) {
-#if DEBUG
-        NSAssert(NO, @"please makesure [request isKindOfClass:[KTBatchRequest class]] be YES");
-#endif
         return;
     }
-    [self.lock lock];
+    
+	[self.lock lock];
     [self.batchRequests removeObject:request];
     [self.lock unlock];
-    for (__kindof KTBaseRequest *baseRequest in [request.requestArray copy]) {
-        [baseRequest stop];
-    }
+
     [self judgeToStartBufferRequestsWithRequest:request];
 }
 
-- (void)addChainRequest:(__kindof KTChainRequest *)request
+- (void)startChainRequest:(__kindof KTChainRequest *)request
 {
     if (!request) {
-#if DEBUG
-        NSAssert(NO, @"request can't be nil");
-#endif
         return;
     }
 	
     if (![request isKindOfClass:[KTChainRequest class]]) {
-#if DEBUG
-        NSAssert(NO, @"please makesure [request isKindOfClass:[KTChainRequest class]] be YES");
-#endif
         return;
     }
 	
@@ -670,7 +295,7 @@ static dispatch_once_t onceToken;
             [self.chainRequests addObject:request];
         }
         [self.lock unlock];
-        [request start];
+        [request realyStart];
     }
 }
 
@@ -691,38 +316,11 @@ static dispatch_once_t onceToken;
     [self.lock lock];
     [self.chainRequests removeObject:request];
     [self.lock unlock];
-    for (__kindof KTBaseRequest *baseRequest in [request.requestArray copy]) {
-        [baseRequest stop];
-    }
+   
     [self judgeToStartBufferRequestsWithRequest:request];
 }
 
-- (void)addPriorityFirstRequest:(id)request
-{
-    if (!request) {
-#if DEBUG
-        NSAssert(NO, @"request can't be nil");
-#endif
-        return;
-    }
-    if (!([request isKindOfClass:[KTBaseRequest class]]
-          || [request isKindOfClass:[KTBatchRequest class]]
-          || [request isKindOfClass:[KTChainRequest class]])) {
-#if DEBUG
-        NSAssert(NO, @"no support this request as a PriorityFirstRequest");
-#endif
-        return;
-    }
-    
-    if (self.allStartedRequests.count > 0) {
-#if DEBUG
-       NSAssert(NO, @"addPriorityFirstRequest func must use before any request started");
-#endif
-       return;
-    }
-    self.priorityFirstRequest = request;
-}
-
+#pragma mark - all requests
 - (NSArray <__kindof KTBaseRequest *>*)allRequests
 {
     [self.lock lock];
@@ -755,12 +353,262 @@ static dispatch_once_t onceToken;
     return [requestSet allObjects];
 }
 
-- (void)application:(UIApplication *)application handleEventsForBackgroundURLSession:(NSString *)identifier
-                                                                   completionHandler:(void (^)(void))completionHandler
+- (void)cancelAllRequests
 {
-    if ([self.backgroundSessionMananger.backgroundTaskIdentifier isEqualToString:identifier]) {
-        self.backgroundSessionMananger.completionHandler = completionHandler;
-    }
+	if (self.priorityFirstRequest) {
+		if ([self.priorityFirstRequest isKindOfClass:[KTBaseRequest class]]) {
+			KTBaseRequest *request = (KTBaseRequest *)self.priorityFirstRequest;
+			[request stop];
+		} else if ([self.priorityFirstRequest isKindOfClass:[KTBatchRequest class]]) {
+			KTBatchRequest *request = (KTBatchRequest *)self.priorityFirstRequest;
+			[request stop];
+		} else if ([self.priorityFirstRequest isKindOfClass:[KTChainRequest class]]) {
+			KTChainRequest *request = (KTChainRequest *)self.priorityFirstRequest;
+			[request stop];
+		}
+	}
+	
+	[self.lock lock];
+	[self.batchRequests removeAllObjects];
+	[self.chainRequests removeAllObjects];
+	[self.bufferRequests removeAllObjects];
+	[self.lock unlock];
+	
+	[self.lock lock];
+	NSArray *allStartedRequests = [self.allStartedRequests copy];
+	[self.lock unlock];
+	
+	for (__kindof KTBaseRequest *request in allStartedRequests) {
+		[request stop];
+	}
+}
+
+#pragma mark -
+- (void)handleResultWithRequest:(__kindof KTBaseRequest *)request error:(NSError *)error
+{
+	if (!request) {
+		return;
+	}
+	NSError *__autoreleasing serializationError = nil;
+	NSError *__autoreleasing validationError = nil;
+	NSError *requestError = nil;
+	BOOL succeed = NO;
+	
+	if (![request isKindOfClass:[KTBaseDownloadRequest class]]) {
+		NSData *responseData = nil;
+		if ([request.responseObject isKindOfClass:[NSData class]]) {
+			responseData = (NSData *)request.responseObject;
+		}
+		switch (request.responseSerializerType) {
+			case KTResponseSerializerTypeHTTP:
+	//            defalut serializer. do nothing
+				break;
+				
+			case KTResponseSerializerTypeJSON: {
+				request.responseObject = [self.jsonResponseSerializer responseObjectForResponse:request.requestTask.response data:responseData error:&serializationError];
+				request.responseJSONObject = request.responseObject;
+			}
+				break;
+			
+			case KTResponseSerializerTypeXMLParser: {
+				request.responseObject = [self.xmlParserResponseSerialzier responseObjectForResponse:request.requestTask.response data:responseData error:&serializationError];
+			}
+				break;
+				
+			default:
+				break;
+		}
+	}
+	
+	if (error) {
+		succeed = NO;
+		requestError = error;
+	} else if (serializationError) {
+		succeed = NO;
+		requestError = serializationError;
+	} else {
+		if (request.responseSerializerType == KTResponseSerializerTypeHTTP
+			|| request.responseSerializerType == KTResponseSerializerTypeJSON) {
+			succeed = [self validateResult:request error:&validationError];
+			requestError = validationError;
+		}
+	}
+
+	if (succeed) {
+		[self requestDidSucceedWithRequest:request];
+	} else {
+		[self requestDidFailWithRequest:request error:requestError];
+	}
+	
+	if ([[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(afterEachRequest:)]) {
+		[[KTNetworkConfig sharedConfig].requestHelper afterEachRequest:request];
+	}
+	
+#if DEBUG
+	[self printRequestDescription:request];
+#endif
+	
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[self.lock lock];
+		[self.allStartedRequests removeObject:request];
+		[self.lock unlock];
+	});
+}
+
+- (BOOL)validateResult:(__kindof KTBaseRequest *)request error:(NSError * _Nullable __autoreleasing *)error
+{
+	if ([request isKindOfClass:[KTBaseDownloadRequest class]]) {
+		return YES;
+	}
+	
+	BOOL result = YES;
+	id json = request.responseJSONObject;
+	id validator = [request jsonValidator];
+	if (json && validator) {
+		result = [self validateJSON:json withValidator:validator];
+		if (!result) {
+			NSError *tmpError = [[NSError alloc] initWithDomain:KTNetworkErrorDomain code:KTNetworkErrorInvalidJSONFormat userInfo:@{NSLocalizedDescriptionKey:@"validateResult failed",@"extra":request.responseJSONObject?:@{}}];
+			if (error != NULL) {
+				*error = tmpError;
+			}
+		}
+	} else if (!json) {
+#if DEBUG
+		NSAssert(NO, @"responseJSONObject can't be nil");
+#endif
+	}
+	return result;
+}
+
+- (void)requestDidSucceedWithRequest:(__kindof KTBaseRequest *)request
+{
+	@autoreleasepool {
+		BOOL needExtraHandle = [request requestSuccessPreHandle];
+		if (needExtraHandle) {
+			if ([KTNetworkConfig sharedConfig].requestHelper &&
+				[[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(preHandleSuccessRequest:)]) {
+				[[KTNetworkConfig sharedConfig].requestHelper preHandleSuccessRequest:request];
+			}
+		}
+	}
+
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[request willFinished];
+		if (request.successBlock) {
+			request.successBlock(request);
+		}
+		[request didFinished];
+		
+		[self judgeToStartBufferRequestsWithRequest:request];
+	});
+}
+
+- (void)requestDidFailWithRequest:(__kindof KTBaseRequest *)request error:(NSError *)error
+{
+	request.error = error;
+	
+	@autoreleasepool {
+	   BOOL needExtraHandle = [request requestFailurePreHandle];
+		if (needExtraHandle) {
+			if ([KTNetworkConfig sharedConfig].requestHelper && [[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(preHandleFailureRequest:)]) {
+				[[KTNetworkConfig sharedConfig].requestHelper preHandleFailureRequest:request];
+			}
+		}
+	}
+	
+	dispatch_async(dispatch_get_main_queue(), ^{
+		if (request.isIndependentRequest) {
+			if (request.requestAccessory &&
+				[request.requestAccessory respondsToSelector:@selector(requestWillStop:)]) {
+				[request.requestAccessory requestWillStop:request];
+			}
+		}
+		
+		if (request.failureBlock) {
+			request.failureBlock(request);
+		}
+		
+		if (request.isIndependentRequest) {
+			if (request.requestAccessory &&
+				[request.requestAccessory respondsToSelector:@selector(requestDidStop:)]) {
+				[request.requestAccessory requestDidStop:request];
+			}
+		}
+		
+		[self judgeToStartBufferRequestsWithRequest:request];
+	});
+}
+
+- (NSString *)buildRequestUrl:(__kindof KTBaseRequest *)request
+{
+	NSString *urlStr = [request buildCustomRequestUrl];
+	if (!urlStr || (urlStr && [urlStr isKindOfClass:[NSString class]] && urlStr.length == 0)) {
+		NSString *detailUrl = [request requestUrl];
+		
+		if ([[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(filterUrl:withRequest:)]) {
+			detailUrl = [[KTNetworkConfig sharedConfig].requestHelper filterUrl:detailUrl withRequest:request];
+		}
+		
+		NSString *baseUrl = @"";
+		if ([request useCDN]) {
+			if (request.cdnBaseUrl.length > 0) {
+				baseUrl = request.cdnBaseUrl;
+			} else {
+				if ([[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(baseUrlOfRequest:)]) {
+					 baseUrl = [[KTNetworkConfig sharedConfig].requestHelper baseUrlOfRequest:request];
+				} else {
+					baseUrl = [KTNetworkConfig sharedConfig].cdnBaseUrl;
+				}
+			}
+		} else {
+			if (request.baseUrl.length > 0) {
+				baseUrl = request.baseUrl;
+			} else {
+				if ([[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(baseUrlOfRequest:)]) {
+					 baseUrl = [[KTNetworkConfig sharedConfig].requestHelper baseUrlOfRequest:request];
+				} else {
+					 baseUrl = [KTNetworkConfig sharedConfig].baseUrl;
+				}
+			}
+		}
+		if (baseUrl.length == 0) {
+#if DEBUG
+			NSAssert(NO, @"please make sure baseUrl.length > 0 be YES!");
+#endif
+		}
+		NSURL *url = [NSURL URLWithString:baseUrl];
+		if (baseUrl.length > 0 && ![baseUrl hasSuffix:@"/"]) {
+			url = [url URLByAppendingPathComponent:@""];
+		}
+		if (![[url path] isEqualToString:@"/"]) {
+			detailUrl = [NSString stringWithFormat:@"%@%@",[url path],detailUrl];
+		}
+		urlStr = [NSURL URLWithString:detailUrl relativeToURL:url].absoluteString;
+	}
+	return urlStr;
+}
+
+#pragma mark - priority & buffer requests
+- (void)addPriorityFirstRequest:(id)request
+{
+	if (!request) {
+		return;
+	}
+	
+	if (!([request isKindOfClass:[KTBaseRequest class]]
+		  || [request isKindOfClass:[KTBatchRequest class]]
+		  || [request isKindOfClass:[KTChainRequest class]])) {
+		return;
+	}
+	
+	if (self.allStartedRequests.count > 0) {
+#if DEBUG
+	   NSAssert(NO, @"addPriorityFirstRequest func must use before any request started");
+#endif
+	   return;
+	}
+	
+	self.priorityFirstRequest = request;
 }
 
 - (void)judgeToStartBufferRequestsWithRequest:(id)request
@@ -769,17 +617,27 @@ static dispatch_once_t onceToken;
         self.priorityFirstRequest = nil;
         for (id tmpRequest in self.bufferRequests) {
             if ([tmpRequest isKindOfClass:[KTBaseRequest class]]) {
-                [self addRequest:tmpRequest];
+                [self startRequest:tmpRequest];
             } else if ([tmpRequest isKindOfClass:[KTBatchRequest class]]) {
-                [self addBatchRequest:tmpRequest];
+                [self startBatchRequest:tmpRequest];
             } else if ([tmpRequest isKindOfClass:[KTChainRequest class]]) {
-                [self addChainRequest:tmpRequest];
+                [self startChainRequest:tmpRequest];
             }
         }
         [self.bufferRequests removeAllObjects];
     }
 }
 
+#pragma mark - background
+- (void)application:(UIApplication *)application handleEventsForBackgroundURLSession:(NSString *)identifier
+																   completionHandler:(void (^)(void))completionHandler
+{
+	if ([self.backgroundSessionMananger.backgroundTaskIdentifier isEqualToString:identifier]) {
+		self.backgroundSessionMananger.completionHandler = completionHandler;
+	}
+}
+
+#pragma mark - serializer
 - (AFHTTPRequestSerializer *)requestSerializerForRequest:(__kindof KTBaseRequest *)request
 {
     AFHTTPRequestSerializer *requestSerializer = nil;
@@ -821,6 +679,134 @@ static dispatch_once_t onceToken;
     AFXMLParserResponseSerializer *xmlParserResponseSerialzier = [AFXMLParserResponseSerializer serializer];
     xmlParserResponseSerialzier.acceptableStatusCodes = _allStatusCodes;
     return xmlParserResponseSerialzier;
+}
+
+#pragma mark - task
+- (NSURLSessionTask *)sessionTaskForRequest:(__kindof KTBaseRequest *)request error:(NSError * _Nullable __autoreleasing *)error
+{
+	NSString *url = nil;
+	id param = nil;
+	if (request.useSignature) {
+		if ([request customSignature]) {
+			url = request.signaturedUrl;
+			param = request.signaturedParams;
+		} else {
+			if ([[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(signatureRequest:)]) {
+				[[KTNetworkConfig sharedConfig].requestHelper signatureRequest:request];
+				url = request.signaturedUrl;
+				param = request.signaturedParams;
+			} else {
+				NSError *signatureError = [NSError errorWithDomain:KTNetworkErrorDomain code:KTNetworkErrorNotSupportSignature userInfo:@{@"msg":@"the requestHelper do not implement selecotr signatureRequest:"}];
+				signatureError = *error;
+				return nil;
+			}
+		}
+	} else {
+		url = [self buildRequestUrl:request];
+		param = request.requestArgument;
+	}
+	
+	if ([KTNetworkConfig sharedConfig].isMock) {
+		BOOL needMock = [VVMockManager matchRequest:request url:url];
+		if (needMock) {
+			NSURL *Url = [NSURL URLWithString:url];
+			NSString *scheme = Url.scheme;
+			NSString *host = Url.host;
+			NSNumber *port = Url.port;
+			NSString *domain = nil;
+			if (port) {
+				domain = [NSString stringWithFormat:@"%@://%@:%@",scheme,host,port];
+			} else {
+				domain = [NSString stringWithFormat:@"%@://%@",scheme,host];
+			}
+		   url = [url stringByReplacingOccurrencesOfString:domain withString:[KTNetworkConfig sharedConfig].mockBaseUrl];
+		}
+	}
+	
+	AFHTTPRequestSerializer *requestSerializer = [self requestSerializerForRequest:request];
+	if ([request isKindOfClass:[KTBaseDownloadRequest class]]) {
+		return [self downloadTaskWithRequest:(KTBaseDownloadRequest *)request requestSerializer:requestSerializer URLString:url parameters:param error:error];
+	} else if ([request isKindOfClass:[KTBaseUploadRequest class]]) {
+		return [self uploadTaskWithRequest:request requestSerializer:requestSerializer URLString:url parameters:param error:error];
+	} else {
+		return [self dataTaskWithRequest:request requestSerializer:requestSerializer URLString:url parameters:param error:error];
+	}
+}
+
+- (NSURLSessionTask *)downloadTaskWithRequest:(__kindof KTBaseDownloadRequest *)request
+							requestSerializer:(AFHTTPRequestSerializer *)requestSerializer
+									URLString:(NSString *)URLString
+									parameters:(id)parameters
+										 error:(NSError * _Nullable __autoreleasing *)error
+{
+   __block NSURLSessionTask *dataTask = [self.backgroundSessionMananger dataTaskWithDownloadRequest:request requestSerializer:requestSerializer URLString:URLString parameters:parameters progress:request.progressBlock completionHandler:^(NSURLResponse * _Nonnull response, NSError * _Nullable error) {
+		[self handleResultWithRequest:request error:error];
+	} error:error];
+	return dataTask;
+}
+
+- (NSURLSessionDataTask *)uploadTaskWithRequest:(__kindof KTBaseUploadRequest *)request
+								requestSerializer:(AFHTTPRequestSerializer *)requestSerializer
+										URLString:(NSString *)URLString
+									   parameters:(id)parameters
+											error:(NSError * _Nullable __autoreleasing *)error
+{
+	NSMutableURLRequest *urlRequest = [requestSerializer multipartFormRequestWithMethod:@"POST" URLString:URLString parameters:parameters constructingBodyWithBlock:request.formDataBlock error:error];
+	__block NSURLSessionDataTask *dataTask = [self.sessionManager dataTaskWithRequest:urlRequest uploadProgress:request.progressBlock downloadProgress:nil completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
+		request.responseObject = responseObject;
+		[self handleResultWithRequest:request error:error];
+	}];
+	request.requestTask = dataTask;
+	return dataTask;
+}
+
+- (NSURLSessionDataTask *)dataTaskWithRequest:(__kindof KTBaseRequest *)request
+							requestSerializer:(AFHTTPRequestSerializer *)requestSerializer
+									URLString:(NSString *)URLString
+								   parameters:(id)parameters
+										error:(NSError * _Nullable __autoreleasing *)error
+{
+	NSString *method = nil;
+	switch (request.requestMethod) {
+		case KTRequestMethodGET:
+		{
+			method = @"GET";
+		}
+			break;
+		case KTRequestMethodPOST:
+		{
+			method = @"POST";
+		}
+			break;
+		case KTRequestMethodHEAD:
+		{
+			method = @"HEAD";
+		}
+			break;
+		case KTRequestMethodPUT:
+		{
+			method = @"PUT";
+		}
+			break;
+		case KTRequestMethodDELETE:
+		{
+			method = @"DELETE";
+		}
+			break;
+		case KTRequestMethodPATCH:
+		{
+			method = @"PATCH";
+		}
+			break;
+		default:
+			break;
+	}
+	NSMutableURLRequest *urlRequest = [requestSerializer requestWithMethod:method URLString:URLString parameters:parameters error:error];
+	__block NSURLSessionDataTask *dataTask = [self.sessionManager dataTaskWithRequest:urlRequest uploadProgress:nil downloadProgress:nil completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
+		request.responseObject = responseObject;
+		[self handleResultWithRequest:request error:error];
+	}];
+	return dataTask;
 }
 
 #pragma mark - private -

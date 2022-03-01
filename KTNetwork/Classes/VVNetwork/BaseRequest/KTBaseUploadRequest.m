@@ -21,7 +21,7 @@
 	self.failureBlock = failureBlock;
 	self.progressBlock = uploadProgressBlock;
 	self.formDataBlock = formDataBlock;
-	[[KTNetworkAgent sharedAgent] addRequest:self];
+	[[KTNetworkAgent sharedAgent] startRequest:self];
 }
 
 @end

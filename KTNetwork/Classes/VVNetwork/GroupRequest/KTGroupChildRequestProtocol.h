@@ -8,9 +8,11 @@
 #ifndef KTRequestInGroupProtocol_h
 #define KTRequestInGroupProtocol_h
 
+#import "KTRequestProcessProtocol.h"
+
 @class KTGroupRequest;
 
-@protocol KTGroupChildRequestProtocol <NSObject>
+@protocol KTGroupChildRequestProtocol <KTRequestProcessProtocol>
 
 @property (nonatomic, weak, nullable) __kindof KTGroupRequest *groupRequest;
 
@@ -24,10 +26,6 @@
 - (BOOL)isIndependentRequest;
 /// complete the groupRequest(batchRequest or chainRequest) in advance,even if the groupRequest has requests not complete.
 - (void)inAdvanceCompleteGroupRequestWithResult:(BOOL)isSuccess;
-
-- (void)start;
-
-- (void)stop;
 
 @end
 

@@ -23,27 +23,10 @@
 
 @implementation KTBatchRequest
 
-- (void)start
+- (void)realyStart
 {
-	if (self.requestArray.count == 0) {
-#if DEBUG
-		NSAssert(NO, @"please makesure self.requestArray.count > 0");
-#endif
-		return;
-	}
-	
-	if (self.executing) {
-		return;
-	}
-	
 	self.executing = YES;
-	if (self.isIndependentRequest) {
-		if (self.requestAccessory
-			&& [self.requestAccessory respondsToSelector:@selector(requestWillStart:)]) {
-			[self.requestAccessory requestWillStart:self];
-		}
-	}
-	
+
 	for (id <KTGroupChildRequestProtocol> request in self.requestArray) {
 		if ([request isKindOfClass:[KTBaseUploadRequest class]]) {
 			KTBaseUploadRequest *uploadRequest = (KTBaseUploadRequest *)request;
@@ -65,40 +48,64 @@
 				@strongify(self);
 				[self handleFailureOfRequest:request];
 			}];
-		} else  if ([request isKindOfClass:[KTBaseRequest class]]) {
+		} else if ([request isKindOfClass:[KTBaseRequest class]]) {
 			@weakify(self);
 			KTBaseRequest *baseRequest = (KTBaseRequest *)request;
-			[baseRequest startWithCompletionSuccess:^(__kindof KTBaseRequest * _Nonnull request) {
+			[baseRequest startWithCompletionSuccess:^(id <KTRequestProcessProtocol> _Nonnull request) {
 				@strongify(self);
-				[self handleSuccessOfRequest:request];
-			} failure:^(__kindof KTBaseRequest * _Nonnull request) {
+				[self handleSuccessOfRequest:(KTBaseRequest *)request];
+			} failure:^(id <KTRequestProcessProtocol> _Nonnull request) {
 				@strongify(self);
-				[self handleFailureOfRequest:request];
+				[self handleFailureOfRequest:(KTBaseRequest *)request];
 			}];
 		} else if ([request isKindOfClass:[KTBatchRequest class]]) {
 			KTBatchRequest *batchRequest = (KTBatchRequest *)request;
 			@weakify(self);
-			[batchRequest startWithCompletionSuccess:^(KTBatchRequest * _Nonnull batchRequest) {
+			[batchRequest startWithCompletionSuccess:^(id <KTRequestProcessProtocol> batchRequest) {
 				@strongify(self);
 				[self handleSuccessOfRequest:request];
-			} failure:^(KTBatchRequest * _Nonnull batchRequest) {
+			} failure:^(id <KTRequestProcessProtocol> batchRequest) {
 				@strongify(self);
 				[self handleFailureOfRequest:request];
 			}];
 		} else if ([request isKindOfClass:[KTChainRequest class]]) {
 			KTChainRequest *chainRequest = (KTChainRequest *)request;
 			@weakify(self);
-			[chainRequest startWithCompletionSuccess:^(KTChainRequest * _Nonnull chainRequest) {
+			[chainRequest startWithCompletionSuccess:^(id <KTRequestProcessProtocol> chainRequest) {
 				@strongify(self);
 				[self handleSuccessOfRequest:request];
-			} failure:^(KTChainRequest * _Nonnull chainRequest) {
+			} failure:^(id <KTRequestProcessProtocol> chainRequest) {
 				@strongify(self);
 				[self handleFailureOfRequest:request];
 			}];
 		}
 	}
+	
+	[self didStart];
 }
 
+#pragma mark - public
+- (void)inAdvanceCompleteWithResult:(BOOL)isSuccess
+{
+#if DEBUG
+	NSAssert(NO, @"not support now");
+#endif
+}
+
+- (void)configRequireSuccessRequests:(nullable NSArray <id <KTGroupChildRequestProtocol>> *)requests
+{
+	for (id <KTGroupChildRequestProtocol> request in requests) {
+		if (![request conformsToProtocol:@protocol(KTGroupChildRequestProtocol)]) {
+#if DEBUG
+			NSAssert(NO, @"please make sure request conforms protocol KTRequestInGroupProtocol");
+#endif
+			return;
+		}
+	}
+	self.requireSuccessRequests = [NSMutableArray arrayWithArray:requests];
+}
+
+#pragma mark - finish handle
 - (void)handleSuccessOfRequest:(id <KTGroupChildRequestProtocol>)request
 {
 	self.finishedCount++;
@@ -142,63 +149,6 @@
 			}
 		}
 	}
-}
-
-- (void)finishAllRequestsWithSuccessBlock
-{
-	[self handleAccessoryWithBlock:^{
-		if (self.groupSuccessBlock) {
-			self.groupSuccessBlock(self);
-		}
-	}];
-	[self stop];
-}
-
-- (void)finishAllRequestsWithFailureBlock
-{
-	[self handleAccessoryWithBlock:^{
-		if (self.groupFailureBlock) {
-			self.groupFailureBlock(self);
-		}
-	}];
-	[self stop];
-}
-
-- (void)stop
-{
-	[self clearCompletionBlock];
-	self.finishedCount = 0;
-	self.failedRequests = nil;
-	[[KTNetworkAgent sharedAgent] removeBatchRequest:self];
-	self.executing = NO;
-}
-
-- (void)inAdvanceCompleteWithResult:(BOOL)isSuccess
-{
-#if DEBUG
-	NSAssert(NO, @"not support now");
-#endif
-}
-
-- (void)configRequireSuccessRequests:(nullable NSArray <id <KTGroupChildRequestProtocol>> *)requests
-{
-	for (id <KTGroupChildRequestProtocol> request in requests) {
-		if (![request conformsToProtocol:@protocol(KTGroupChildRequestProtocol)]) {
-#if DEBUG
-			NSAssert(NO, @"please make sure request conforms protocol KTRequestInGroupProtocol");
-#endif
-			return;
-		}
-	}
-	self.requireSuccessRequests = [NSMutableArray arrayWithArray:requests];
-}
-
-- (void)startWithCompletionSuccess:(nullable void (^)(KTBatchRequest *batchRequest))successBlock
-						   failure:(nullable void (^)(KTBatchRequest *batchRequest))failureBlock
-{
-	self.groupSuccessBlock = successBlock;
-	self.groupFailureBlock = failureBlock;
-	[[KTNetworkAgent sharedAgent] addBatchRequest:self];
 }
 
 @end
