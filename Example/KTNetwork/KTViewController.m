@@ -8,6 +8,8 @@
 
 #import "KTViewController.h"
 #import "KTBaseRequest.h"
+#import "KTNetworkAgent.h"
+#import "KTNetworkConfig.h"
 
 @interface KTViewController ()
 
@@ -20,19 +22,27 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
 	
+	[self config];
+	
 	[self testRequest];
 }
 
-- (void)didReceiveMemoryWarning
+- (void)config
 {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+//	NSMutableSet *acceptableContentTypes = [NSMutableSet setWithSet:[KTNetworkAgent sharedAgent].jsonResponseSerializer.acceptableContentTypes];
+//	[acceptableContentTypes addObject:@"text/html"];
+//	[KTNetworkAgent sharedAgent].jsonResponseSerializer.acceptableContentTypes = acceptableContentTypes;
+	
+	[KTNetworkConfig sharedConfig].acceptableContentTypes = [NSSet setWithObject:@"text/html"];
 }
 
 - (void)testRequest
 {
 	KTBaseRequest *request = [[KTBaseRequest alloc] init];
-	request.baseUrl = @"https://www.phonegap100.com/appapi.php?a=getPortalList&catid=20&page=1";
+//	[request addRequestHeader:@{
+//		@"Accept" : @"application/json",
+//	}];
+	request.customRequestUrl = @"http://www.phonegap100.com/appapi.php?a=getPortalList&catid=20&page=1";
 	[request startWithCompletionSuccess:^(__kindof KTBaseRequest * _Nonnull request) {
 			
 	} failure:^(__kindof KTBaseRequest * _Nonnull request) {

@@ -671,6 +671,13 @@ static dispatch_once_t onceToken;
     AFJSONResponseSerializer *jsonResponseSerializer = [AFJSONResponseSerializer serializer];
     jsonResponseSerializer.acceptableStatusCodes = _allStatusCodes;
     jsonResponseSerializer.removesKeysWithNullValues = YES;
+	
+	if ([KTNetworkConfig sharedConfig].acceptableContentTypes.count) {
+		NSMutableSet *acceptableContentTypes = [NSMutableSet setWithSet:jsonResponseSerializer.acceptableContentTypes];
+		[acceptableContentTypes unionSet:[KTNetworkConfig sharedConfig].acceptableContentTypes];
+		jsonResponseSerializer.acceptableContentTypes = acceptableContentTypes;
+	}
+
     return jsonResponseSerializer;
 }
 

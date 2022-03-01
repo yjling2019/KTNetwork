@@ -50,6 +50,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// if not set,use the default config
 @property (nonatomic, strong, nullable) NSSet <NSString *> *HTTPMethodsEncodingParametersInURI;
 
+@property (nonatomic, strong, nullable) NSSet *acceptableContentTypes;
+
 - (void)configRequestHelper:(id<KTRequestHelperProtocol>)requestHelper;
 
 @end
