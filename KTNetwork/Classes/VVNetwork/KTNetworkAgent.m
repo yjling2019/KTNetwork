@@ -19,6 +19,8 @@
 #import "TDScope.h"
 #import "KTBaseRequest+Private.h"
 
+static dispatch_once_t onceToken;
+
 @interface KTBaseRequest(KTNetworkAgent)
 
 /// 每次真正发起请求前，重置状态，避免受到上次请求数据的干扰
@@ -122,7 +124,6 @@
         return;
     }
 	
-    static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
 		if ([[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(beforeAllRequests)]) {
 			[[KTNetworkConfig sharedConfig].requestHelper beforeAllRequests];
@@ -568,12 +569,20 @@
 #endif
         return;
     }
+	
     if (![request isKindOfClass:[KTBatchRequest class]]) {
 #if DEBUG
         NSAssert(NO, @"please makesure [request isKindOfClass:[KTBatchRequest class]] be YES");
 #endif
         return;
     }
+	
+	dispatch_once(&onceToken, ^{
+		if ([[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(beforeAllRequests)]) {
+			[[KTNetworkConfig sharedConfig].requestHelper beforeAllRequests];
+		}
+	});
+	
     if (self.priorityFirstRequest && ![self.priorityFirstRequest isEqual:request]) {
         [self.lock lock];
         if (![self.bufferRequests containsObject:request]) {
@@ -621,12 +630,20 @@
 #endif
         return;
     }
+	
     if (![request isKindOfClass:[KTChainRequest class]]) {
 #if DEBUG
         NSAssert(NO, @"please makesure [request isKindOfClass:[KTChainRequest class]] be YES");
 #endif
         return;
     }
+	
+	dispatch_once(&onceToken, ^{
+		if ([[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(beforeAllRequests)]) {
+			[[KTNetworkConfig sharedConfig].requestHelper beforeAllRequests];
+		}
+	});
+	
     if (self.priorityFirstRequest && ![self.priorityFirstRequest isEqual:request]) {
         [self.lock lock];
         if (![self.bufferRequests containsObject:request]) {
