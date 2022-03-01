@@ -51,7 +51,7 @@
         NSString *cacheFolder = [cacheDir stringByAppendingPathComponent:@"VVIncomplete"];
         NSFileManager *fileManager = [NSFileManager defaultManager];
         NSError *error = nil;
-        if(![fileManager createDirectoryAtPath:cacheFolder withIntermediateDirectories:YES attributes:nil error:&error]) {
+        if (![fileManager createDirectoryAtPath:cacheFolder withIntermediateDirectories:YES attributes:nil error:&error]) {
     #if DEBUG
             NSLog(@"Failed to create cache directory at %@", cacheFolder);
     #endif
@@ -69,7 +69,7 @@
        NSString *downloadFolder = [documentPath stringByAppendingPathComponent:@"KTNetworking_download"];
         NSFileManager *fileManager = [NSFileManager defaultManager];
         NSError *error = nil;
-        if(![fileManager createDirectoryAtPath:downloadFolder withIntermediateDirectories:YES attributes:nil error:&error]) {
+        if (![fileManager createDirectoryAtPath:downloadFolder withIntermediateDirectories:YES attributes:nil error:&error]) {
     #if DEBUG
             NSLog(@"Failed to create download directory at %@", downloadFolder);
     #endif

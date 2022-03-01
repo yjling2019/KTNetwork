@@ -136,7 +136,7 @@
 			if (self.failedRequests.count != self.requestArray.count) {
 				// not all requests failed ,the batchRequest should call success block
 				[self finishAllRequestsWithSuccessBlock];
-			}else {
+			} else {
 				// all requests failed,the batchRequests should call fail block
 				[self finishAllRequestsWithFailureBlock];
 			}

@@ -209,7 +209,7 @@
         } else if ([self.priorityFirstRequest isKindOfClass:[KTBatchRequest class]]) {
             KTBatchRequest *request = (KTBatchRequest *)self.priorityFirstRequest;
             [request stop];
-        } else if ([self.priorityFirstRequest isKindOfClass:[KTChainRequest class]]){
+        } else if ([self.priorityFirstRequest isKindOfClass:[KTChainRequest class]]) {
             KTChainRequest *request = (KTChainRequest *)self.priorityFirstRequest;
             [request stop];
         }
@@ -532,13 +532,13 @@
                     baseUrl = [KTNetworkConfig sharedConfig].cdnBaseUrl;
                 }
             }
-        } else{
+        } else {
             if (request.baseUrl.length > 0) {
                 baseUrl = request.baseUrl;
             } else {
                 if ([[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(baseUrlOfRequest:)]) {
                      baseUrl = [[KTNetworkConfig sharedConfig].requestHelper baseUrlOfRequest:request];
-                }else {
+                } else {
                      baseUrl = [KTNetworkConfig sharedConfig].baseUrl;
                 }
             }
@@ -712,7 +712,7 @@
             KTBatchRequest *request = (KTBatchRequest *)self.priorityFirstRequest;
             NSArray *tmpArray = request.requestArray;
             [requestSet addObjectsFromArray:tmpArray];
-        } else if([self.priorityFirstRequest isKindOfClass:[KTChainRequest class]]) {
+        } else if ([self.priorityFirstRequest isKindOfClass:[KTChainRequest class]]) {
             KTChainRequest *request = self.priorityFirstRequest;
             NSArray *tmpArray = request.requestArray;
             [requestSet addObjectsFromArray:tmpArray];
