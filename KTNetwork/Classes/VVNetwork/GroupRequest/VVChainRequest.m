@@ -16,7 +16,7 @@
 
 @interface VVChainRequest()
 
-@property (nonatomic, strong, nullable) __kindof NSObject<VVGroupChildRequestProtocol> *lastRequest;
+@property (nonatomic, strong, nullable) id <VVGroupChildRequestProtocol> lastRequest;
 @property (nonatomic, assign, readonly) BOOL canStartNextRequest;
 
 @end
@@ -153,7 +153,7 @@
 			return;
 		}
 	}
-	for (__kindof NSObject<VVGroupChildRequestProtocol> *tmpRequest in [self.requestArray copy]) {
+	for (id <VVGroupChildRequestProtocol> tmpRequest in [self.requestArray copy]) {
 		[tmpRequest stop];
 	}
 	[self handleAccessoryWithBlock:^{

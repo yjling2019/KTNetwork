@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VVBaseRequest()
 
-@property (nonatomic, strong) NSURLSessionTask *requestTask;
+@property (nonatomic, strong, nullable) NSURLSessionTask *requestTask;
 
 @property (nonatomic, assign) BOOL isDataFromCache;
 

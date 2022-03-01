@@ -28,7 +28,7 @@
     return self;
 }
 
-- (void)addRequest:(__kindof NSObject<VVGroupChildRequestProtocol> *)request
+- (void)addRequest:(id <VVGroupChildRequestProtocol>)request
 {
     if (![request conformsToProtocol:@protocol(VVGroupChildRequestProtocol)]) {
 #if DEBUG
@@ -46,7 +46,7 @@
     [self.requestArray addObject:request];
 }
 
-- (void)addRequestsWithArray:(NSArray<__kindof VVBaseRequest *> *)requestArray
+- (void)addRequestsWithArray:(NSArray <id <VVGroupChildRequestProtocol>> *)requestArray
 {
     NSMutableSet *tmpSet = [NSMutableSet setWithArray:requestArray];
     if (tmpSet.count != requestArray.count) {
@@ -63,7 +63,7 @@
 #endif
         return;
     }
-    for (__kindof NSObject<VVGroupChildRequestProtocol> *request  in requestArray) {
+    for (id <VVGroupChildRequestProtocol> request in requestArray) {
         [self addRequest:request];
     }
 }

@@ -100,6 +100,10 @@ static NSString * const VVNetworkErrorDomain = @"VVNetworkError";
 
 - (void)addRequestHeader:(NSDictionary <NSString *,NSString *>*)header;
 
+#pragma mark - identifier
+@property (nonatomic, copy) NSString *module;
+@property (nonatomic, copy) NSString *tag;
+
 #pragma mark - context
 @property (nonatomic, assign, readonly) BOOL isIndependentRequest;
 /// the requestTask of the Request

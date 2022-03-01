@@ -17,7 +17,7 @@
 
 @interface VVBatchRequest()
 
-@property (nonatomic, strong, nullable) NSMutableArray<__kindof NSObject<VVGroupChildRequestProtocol> *> *requireSuccessRequests;
+@property (nonatomic, strong, nullable) NSMutableArray <id <VVGroupChildRequestProtocol>> *requireSuccessRequests;
 
 @end
 
@@ -44,7 +44,7 @@
 		}
 	}
 	
-	for (__kindof NSObject<VVGroupChildRequestProtocol> *request in self.requestArray) {
+	for (id <VVGroupChildRequestProtocol> request in self.requestArray) {
 		if ([request isKindOfClass:[VVBaseUploadRequest class]]) {
 			VVBaseUploadRequest *uploadRequest = (VVBaseUploadRequest *)request;
 			@weakify(self);
@@ -99,7 +99,7 @@
 	}
 }
 
-- (void)handleSuccessOfRequest:(__kindof NSObject<VVGroupChildRequestProtocol> *)request
+- (void)handleSuccessOfRequest:(id <VVGroupChildRequestProtocol>)request
 {
 	self.finishedCount++;
 	if (request.successBlock) {
@@ -111,7 +111,7 @@
 	}
 }
 
-- (void)handleFailureOfRequest:(__kindof NSObject<VVGroupChildRequestProtocol> *)request
+- (void)handleFailureOfRequest:(id <VVGroupChildRequestProtocol>)request
 {
 	if (!self.failedRequests) {
 		self.failedRequests = [NSMutableArray new];
@@ -122,7 +122,7 @@
 		if (request.failureBlock) {
 			request.failureBlock(request);
 		}
-		for (__kindof NSObject<VVGroupChildRequestProtocol> *tmpRequest in [self.requestArray copy]) {
+		for (id <VVGroupChildRequestProtocol> tmpRequest in [self.requestArray copy]) {
 			[tmpRequest stop];
 		}
 		[self finishAllRequestsWithFailureBlock];
@@ -180,9 +180,9 @@
 #endif
 }
 
-- (void)configRequireSuccessRequests:(nullable NSArray <__kindof NSObject<VVGroupChildRequestProtocol> *> *)requests
+- (void)configRequireSuccessRequests:(nullable NSArray <id <VVGroupChildRequestProtocol>> *)requests
 {
-	for (__kindof NSObject<VVGroupChildRequestProtocol> *request in requests) {
+	for (id <VVGroupChildRequestProtocol> request in requests) {
 		if (![request conformsToProtocol:@protocol(VVGroupChildRequestProtocol)]) {
 #if DEBUG
 			NSAssert(NO, @"please make sure request conforms protocol VVRequestInGroupProtocol");

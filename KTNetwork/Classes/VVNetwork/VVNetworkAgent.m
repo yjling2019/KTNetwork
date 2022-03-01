@@ -18,29 +18,9 @@
 #import "VVMockManager.h"
 #import "VVBackgroundSessionManager.h"
 #import "TDScope.h"
+#import "VVBaseRequest+Private.h"
 
 @interface VVBaseRequest(VVNetworkAgent)
-
-@property (nonatomic, strong, readwrite) NSURLSessionTask *requestTask;
-@property (nonatomic, strong, readwrite, nullable) id responseObject;
-@property (nonatomic, strong, readwrite, nullable) NSDictionary *responseJSONObject;
-@property (nonatomic, strong, readwrite, nullable) NSError *error;
-/// the progressBlock of download/upload request
-@property (nonatomic, copy, nullable) void(^progressBlock)(NSProgress *progress);
-/// the request success block
-@property (nonatomic, copy, nullable) void(^successBlock)(__kindof VVBaseRequest *request);
-/// the request failure block
-@property (nonatomic, copy, nullable) void(^failureBlock)(__kindof VVBaseRequest *request);
-
-/// when upload data cofig the formData
-@property (nonatomic, copy, nullable) void (^formDataBlock)(id<AFMultipartFormData> formData);
-/// the url has signatured
-@property (nonatomic, copy, readwrite, nullable) NSString *signaturedUrl;
-/// the params has signatured
-@property (nonatomic, strong, readwrite, nullable) id signaturedParams;
-
-@property (nonatomic, strong, readwrite, nullable) id parsedData;
-
 
 /// 每次真正发起请求前，重置状态，避免受到上次请求数据的干扰
 - (void)resetOriginStatus;
@@ -48,18 +28,6 @@
 @end
 
 @implementation VVBaseRequest(VVNetworkAgent)
-
-@dynamic requestTask;
-@dynamic responseObject;
-@dynamic responseJSONObject;
-@dynamic error;
-@dynamic progressBlock;
-@dynamic successBlock;
-@dynamic failureBlock;
-@dynamic formDataBlock;
-@dynamic signaturedUrl;
-@dynamic signaturedParams;
-@dynamic parsedData;
 
 /// 每次真正发起请求前，重置状态，避免受到上次请求数据的干扰
 - (void)resetOriginStatus
@@ -73,7 +41,6 @@
     self.parsedData = nil;
 }
 
-
 @end
 
 @interface VVNetworkAgent()
@@ -81,8 +48,7 @@
     dispatch_queue_t _processingQueue;
 }
 
-//@property (nonatomic, strong) NSMutableDictionary <NSNumber *, __kindof VVBaseRequest *>*requestDic;
-@property (nonatomic, strong) NSMutableArray <__kindof VVBaseRequest *>*allStartedRequests;
+@property (nonatomic, strong) NSMutableArray <__kindof VVBaseRequest *> *allStartedRequests;
 @property (nonatomic, strong) NSLock *lock;
 @property (nonatomic, strong) AFHTTPSessionManager *sessionManager;
 @property (nonatomic, strong) AFJSONResponseSerializer *jsonResponseSerializer;
@@ -156,6 +122,7 @@
 #endif
         return;
     }
+	
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
 		if ([[VVNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(beforeAllRequests)]) {
@@ -181,9 +148,11 @@
     }
 	
     [request resetOriginStatus];
-    if ([[VVNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(beforeEachRequest:)]) {
+
+	if ([[VVNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(beforeEachRequest:)]) {
         [[VVNetworkConfig sharedConfig].requestHelper beforeEachRequest:request];
     }
+	
     NSError * __autoreleasing requestSerializationError = nil;
     request.requestTask = [self sessionTaskForRequest:request error:&requestSerializationError];
     if (requestSerializationError) {
@@ -191,11 +160,12 @@
         return;
     }
 	
-    [self.lock lock];
     if (request) {
+		[self.lock lock];
         [self.allStartedRequests addObject:request];
+		[self.lock unlock];
     }
-	[self.lock unlock];
+	
     [request.requestTask resume];
 }
 
@@ -213,14 +183,17 @@
 #endif
         return;
     }
+	
     if (![self.allStartedRequests containsObject:request]) {
         [request clearCompletionBlock];
         return;
     }
+	
     if (request.isCancelled
         || request.requestTask.state == NSURLSessionTaskStateCompleted) {
         return;
     }
+	
     [request.requestTask cancel];
     [self.lock lock];
     [self.allStartedRequests removeObject:request];
@@ -560,7 +533,7 @@
                     baseUrl = [VVNetworkConfig sharedConfig].cdnBaseUrl;
                 }
             }
-        }else{
+        } else{
             if (request.baseUrl.length > 0) {
                 baseUrl = request.baseUrl;
             } else {

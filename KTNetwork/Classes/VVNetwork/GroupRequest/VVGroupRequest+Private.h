@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VVGroupRequest()
 
 /// the array of the VVBaseRequest
-@property (nonatomic, strong) NSMutableArray<__kindof NSObject<VVGroupChildRequestProtocol> *> *requestArray;
+@property (nonatomic, strong) NSMutableArray <id <VVGroupChildRequestProtocol>> *requestArray;
 
 /// the block of success
 @property (nonatomic, copy, nullable) void (^groupSuccessBlock)(__kindof VVGroupRequest *request);
@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// the count of finished requests
 @property (nonatomic, assign) NSInteger finishedCount;
 /// the failed requests
-@property (nonatomic, strong, nullable) NSMutableArray<__kindof NSObject<VVGroupChildRequestProtocol> *> *failedRequests;
+@property (nonatomic, strong, nullable) NSMutableArray<id <VVGroupChildRequestProtocol>> *failedRequests;
 
 - (void)handleAccessoryWithBlock:(void(^)(void))block;
 
