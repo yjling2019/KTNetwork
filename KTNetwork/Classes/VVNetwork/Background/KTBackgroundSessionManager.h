@@ -1,6 +1,6 @@
 //
-//  VVBackgroundSessionManager.h
-//  vv_rootlib_ios
+//  KTBackgroundSessionManager.h
+//  KOTU
 //
 //  Created by KOTU on 2020/12/12.
 //
@@ -9,16 +9,16 @@
 
 
 NS_ASSUME_NONNULL_BEGIN
-@class VVBaseDownloadRequest;
+@class KTBaseDownloadRequest;
 @class AFHTTPRequestSerializer;
 
-@interface VVBackgroundSessionManager : NSObject
+@interface KTBackgroundSessionManager : NSObject
 /// the background url task identifer
 @property (nonatomic, copy, readonly, nonnull) NSString *backgroundTaskIdentifier;
 
 @property (nonatomic, copy, nullable) void (^completionHandler)(void);
 
-- (NSURLSessionTask *)dataTaskWithDownloadRequest:(__kindof VVBaseDownloadRequest *)request
+- (NSURLSessionTask *)dataTaskWithDownloadRequest:(__kindof KTBaseDownloadRequest *)request
                                 requestSerializer:(AFHTTPRequestSerializer *)requestSerializer
                                         URLString:(NSString *)URLString
                                        parameters:(id)parameters

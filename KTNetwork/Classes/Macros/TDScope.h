@@ -2,8 +2,7 @@
 //  scope.h
 //  qrhelper
 //
-//  Created by Demi on 5/30/16.
-//  Copyright © 2016 demiwan. All rights reserved.
+//  Created by KOTU on 5/30/16.
 //
 
 #ifndef scope_h

@@ -1,16 +1,16 @@
 //
-//  VVBaseDownloadRequest.m
+//  KTBaseDownloadRequest.m
 //  KTNetwork
 //
-//  Created by 凌永剑 on 2022/2/25.
+//  Created by KOTU on 2022/2/25.
 //
 
-#import "VVBaseDownloadRequest.h"
-#import "VVNetworkAgent.h"
-#import "VVNetworkConfig.h"
-#import "VVBaseRequest+Private.h"
+#import "KTBaseDownloadRequest.h"
+#import "KTNetworkAgent.h"
+#import "KTNetworkConfig.h"
+#import "KTBaseRequest+Private.h"
 
-@interface VVBaseDownloadRequest()
+@interface KTBaseDownloadRequest()
 
 /// the url of the download file resoure
 @property (nonatomic, copy, readwrite) NSString *absoluteString;
@@ -22,11 +22,11 @@
 
 @end
 
-@implementation VVBaseDownloadRequest
+@implementation KTBaseDownloadRequest
 
 + (instancetype)initWithUrl:(nonnull NSString *)url
 {
-	VVBaseDownloadRequest *request = [[self alloc] init];
+	KTBaseDownloadRequest *request = [[self alloc] init];
 	if (request) {
 #if DEBUG
 		NSAssert(url, @"url can't be nil");
@@ -42,13 +42,13 @@
 }
 
 - (void)downloadWithProgress:(nullable void(^)(NSProgress *downloadProgress))downloadProgressBlock
-					 success:(nullable void(^)(__kindof VVBaseRequest *request))successBlock
-					 failure:(nullable void(^)(__kindof VVBaseRequest *request))failureBlock
+					 success:(nullable void(^)(__kindof KTBaseRequest *request))successBlock
+					 failure:(nullable void(^)(__kindof KTBaseRequest *request))failureBlock
 {
 	self.successBlock = successBlock;
 	self.failureBlock = failureBlock;
 	self.progressBlock = downloadProgressBlock;
-	[[VVNetworkAgent sharedAgent] addRequest:self];
+	[[KTNetworkAgent sharedAgent] addRequest:self];
 }
 
 #pragma mark - - getter - -
@@ -61,7 +61,7 @@
 //        if (!vv_safeStr(self.absoluteString)) {
 //            return nil;
 //        }
-//        NSString *downloadFolderPath = [VVNetworkConfig sharedConfig].downloadFolderPath;
+//        NSString *downloadFolderPath = [KTNetworkConfig sharedConfig].downloadFolderPath;
 //        NSString *fileName = [VVEncryptHelper MD5String:self.absoluteString];
 //        fileName = [fileName stringByAppendingPathExtension:[self.absoluteString pathExtension]]?:@"";
 //        _downloadedFilePath = [NSString pathWithComponents:@[downloadFolderPath, fileName]];
@@ -80,7 +80,7 @@
 //        }
 //        NSString *str = [NSString stringWithFormat:@"backgroundPolicy_%@_%@",@(self.backgroundPolicy),self.absoluteString];
 //        NSString *md5URLStr = [VVEncryptHelper MD5String:str];
-//        _tempFilePath = [[VVNetworkConfig sharedConfig].incompleteCacheFolder stringByAppendingPathComponent:md5URLStr];
+//        _tempFilePath = [[KTNetworkConfig sharedConfig].incompleteCacheFolder stringByAppendingPathComponent:md5URLStr];
 //    }
 //    return _tempFilePath;
 }

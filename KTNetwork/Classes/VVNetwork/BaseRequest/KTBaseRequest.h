@@ -1,45 +1,44 @@
 //
-//  VVBaseRequest.h
-//  VVRootLib
+//  KTBaseRequest.h
+//  KOTU
 //
 //  Created by KOTU on 2019/9/10.
-//  Copyright © 2019 com.lebby.www. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
 #import <AFNetworking/AFHTTPSessionManager.h>
 
 NS_ASSUME_NONNULL_BEGIN
-@class VVBaseRequest,VVNetworkResponse;
+@class KTBaseRequest,KTNetworkResponse;
 
-typedef NS_ENUM(NSInteger,VVRequestMethod)
+typedef NS_ENUM(NSInteger,KTRequestMethod)
 {
-    VVRequestMethodGET = 0,
-    VVRequestMethodPOST,
-    VVRequestMethodHEAD,
-    VVRequestMethodPUT,
-    VVRequestMethodDELETE,
-    VVRequestMethodPATCH,
+    KTRequestMethodGET = 0,
+    KTRequestMethodPOST,
+    KTRequestMethodHEAD,
+    KTRequestMethodPUT,
+    KTRequestMethodDELETE,
+    KTRequestMethodPATCH,
 };
 
-typedef NS_ENUM(NSInteger,VVRequestSerializerType)
+typedef NS_ENUM(NSInteger,KTRequestSerializerType)
 {
-    VVRequestSerializerTypeHTTP = 0,
-    VVRequestSerializerTypeJSON,
+    KTRequestSerializerTypeHTTP = 0,
+    KTRequestSerializerTypeJSON,
 };
 
-typedef NS_ENUM(NSInteger,VVResponseSerializerType)
+typedef NS_ENUM(NSInteger,KTResponseSerializerType)
 {
-    VVResponseSerializerTypeHTTP = 0,
-    VVResponseSerializerTypeJSON,
-    VVResponseSerializerTypeXMLParser,
+    KTResponseSerializerTypeHTTP = 0,
+    KTResponseSerializerTypeJSON,
+    KTResponseSerializerTypeXMLParser,
 };
 
-typedef NS_ENUM(NSInteger,VVNetworkErrorType) {
+typedef NS_ENUM(NSInteger,KTNetworkErrorType) {
 	/// the request not support signature
-	VVNetworkErrorNotSupportSignature = 10000,
+	KTNetworkErrorNotSupportSignature = 10000,
 	/// the response is not a valid json
-	VVNetworkErrorInvalidJSONFormat,
+	KTNetworkErrorInvalidJSONFormat,
 };
 
 typedef NS_ENUM(NSInteger,VVDownloadBackgroundPolicy) {
@@ -51,9 +50,9 @@ typedef NS_ENUM(NSInteger,VVDownloadBackgroundPolicy) {
 	VVDownloadBackgroundRequire,
 };
 
-static NSString * const VVNetworkErrorDomain = @"VVNetworkError";
+static NSString * const KTNetworkErrorDomain = @"KTNetworkError";
 
-@protocol VVRequestAccessoryProtocol <NSObject>
+@protocol KTRequestAccessoryProtocol <NSObject>
 
 @optional
 
@@ -66,7 +65,7 @@ static NSString * const VVNetworkErrorDomain = @"VVNetworkError";
 @end
 
 
-@interface VVBaseRequest : NSObject
+@interface KTBaseRequest : NSObject
 
 #pragma mark - request
 /// the request apiName,fact is a path of url,it can contain path and query params
@@ -78,7 +77,7 @@ static NSString * const VVNetworkErrorDomain = @"VVNetworkError";
 /// the customUrl of the request,it contain domain,path,query, and so on.
 @property (nonatomic, copy, nullable) NSString *customRequestUrl;
 /// the method of the request,default is GET
-@property (nonatomic, assign) VVRequestMethod requestMethod;
+@property (nonatomic, assign) KTRequestMethod requestMethod;
 /// the params of the request
 @property (nonatomic, copy, nullable) NSDictionary *requestArgument;
 
@@ -89,14 +88,14 @@ static NSString * const VVNetworkErrorDomain = @"VVNetworkError";
 /// the request timeout interval
 @property (nonatomic, assign) NSTimeInterval requestTimeoutInterval;
 /// the request serializer type
-@property (nonatomic, assign) VVRequestSerializerType requestSerializerType;
+@property (nonatomic, assign) KTRequestSerializerType requestSerializerType;
 /// the response serializer type
-@property (nonatomic, assign) VVResponseSerializerType responseSerializerType;
+@property (nonatomic, assign) KTResponseSerializerType responseSerializerType;
 /// the request header dic
 @property (nonatomic, copy, nullable) NSDictionary<NSString *, NSString *> *requestHeaders;
 
 /// the network status handle class
-@property (nonatomic,strong, nullable) Class<VVRequestAccessoryProtocol> requestAccessory;
+@property (nonatomic,strong, nullable) Class<KTRequestAccessoryProtocol> requestAccessory;
 
 - (void)addRequestHeader:(NSDictionary <NSString *,NSString *>*)header;
 
@@ -176,8 +175,8 @@ static NSString * const VVNetworkErrorDomain = @"VVNetworkError";
 
 - (void)stop;
 
-- (void)startWithCompletionSuccess:(nullable void(^)(__kindof VVBaseRequest *request))successBlock
-                           failure:(nullable void(^)(__kindof VVBaseRequest *request))failureBlock;
+- (void)startWithCompletionSuccess:(nullable void(^)(__kindof KTBaseRequest *request))successBlock
+                           failure:(nullable void(^)(__kindof KTBaseRequest *request))failureBlock;
 
 - (void)clearCompletionBlock;
 

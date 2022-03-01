@@ -1,32 +1,32 @@
 //
-//  VVBaseRequest+Group.m
+//  KTBaseRequest+Group.m
 //  KTNetwork
 //
-//  Created by 凌永剑 on 2022/2/25.
+//  Created by KOTU on 2022/2/25.
 //
 
-#import "VVBaseRequest+Group.h"
-#import "VVGroupRequest.h"
+#import "KTBaseRequest+Group.h"
+#import "KTGroupRequest.h"
 #import <objc/runtime.h>
 
 static char const *const kGroupRequest ="com.kotu.network.groupRequest";
 
-@implementation VVBaseRequest(Group)
+@implementation KTBaseRequest(Group)
 
 @dynamic successBlock;
 @dynamic failureBlock;
 
-- (void)setGroupRequest:(__kindof VVGroupRequest *)groupRequest
+- (void)setGroupRequest:(__kindof KTGroupRequest *)groupRequest
 {
 	objc_setAssociatedObject(self, kGroupRequest, groupRequest, OBJC_ASSOCIATION_RETAIN);
 }
 
-- (VVGroupRequest *)groupRequest
+- (KTGroupRequest *)groupRequest
 {
 	return objc_getAssociatedObject(self, kGroupRequest);
 }
 
-#pragma mark - - VVRequestInGroupProtocol - -
+#pragma mark - - KTRequestInGroupProtocol - -
 - (BOOL)isIndependentRequest
 {
 	return self.groupRequest ? NO : YES;

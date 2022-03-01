@@ -1,17 +1,16 @@
 //
-//  VVBaseRequest.m
-//  VVRootLib
+//  KTBaseRequest.m
+//  KOTU
 //
 //  Created by KOTU on 2019/9/10.
-//  Copyright © 2019 com.lebby.www. All rights reserved.
 //
 
-#import "VVBaseRequest.h"
-#import "VVNetworkAgent.h"
-#import "VVNetworkConfig.h"
-#import "VVBaseRequest+Private.h"
+#import "KTBaseRequest.h"
+#import "KTNetworkAgent.h"
+#import "KTNetworkConfig.h"
+#import "KTBaseRequest+Private.h"
 
-@implementation VVBaseRequest
+@implementation KTBaseRequest
 
 - (instancetype)init
 {
@@ -38,20 +37,20 @@
         }
     }
     
-    if ([VVNetworkConfig sharedConfig].requestHelper
-        && [[VVNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(judgeToChangeCachePolicy:)]) {
-        [[VVNetworkConfig sharedConfig].requestHelper judgeToChangeCachePolicy:self];
+    if ([KTNetworkConfig sharedConfig].requestHelper
+        && [[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(judgeToChangeCachePolicy:)]) {
+        [[KTNetworkConfig sharedConfig].requestHelper judgeToChangeCachePolicy:self];
     }
 	
     if (self.ignoreCache) {
         self.isDataFromCache = NO;
-        [[VVNetworkAgent sharedAgent] addRequest:self];
+        [[KTNetworkAgent sharedAgent] addRequest:self];
         return;
     }
     
     if (![self readResponseFromCache]) {
         self.isDataFromCache = NO;
-        [[VVNetworkAgent sharedAgent] addRequest:self];
+        [[KTNetworkAgent sharedAgent] addRequest:self];
         return;
     }
     
@@ -66,7 +65,7 @@
 
 - (void)stop
 {
-    [[VVNetworkAgent sharedAgent] cancelRequest:self];
+    [[KTNetworkAgent sharedAgent] cancelRequest:self];
 }
 
 - (BOOL)requestSuccessPreHandle
@@ -83,8 +82,8 @@
     return NO;
 }
 
-- (void)startWithCompletionSuccess:(nullable void(^)(__kindof VVBaseRequest *request))successBlock
-                           failure:(nullable void(^)(__kindof VVBaseRequest *request))failureBlock
+- (void)startWithCompletionSuccess:(nullable void(^)(__kindof KTBaseRequest *request))successBlock
+                           failure:(nullable void(^)(__kindof KTBaseRequest *request))failureBlock
 {
      self.successBlock = successBlock;
      self.failureBlock = failureBlock;
@@ -137,11 +136,11 @@
 
 - (BOOL)readResponseFromCache
 {
-    if ([[VVNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(loadCacheDataOfRequest:error:)]) {
+    if ([[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(loadCacheDataOfRequest:error:)]) {
         NSError *error = nil;
-        id responseObject = [[VVNetworkConfig sharedConfig].requestHelper loadCacheDataOfRequest:self error:&error];
+        id responseObject = [[KTNetworkConfig sharedConfig].requestHelper loadCacheDataOfRequest:self error:&error];
         self.responseObject = responseObject;
-        if (self.responseSerializerType == VVResponseSerializerTypeJSON) {
+        if (self.responseSerializerType == KTResponseSerializerTypeJSON) {
             self.responseJSONObject = responseObject;
         }
         if (!error) {
@@ -154,15 +153,15 @@
 
 - (void)writeResponseToCacheFile
 {
-    if ([[VVNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(saveResponseToCacheOfRequest:)]) {
-        [[VVNetworkConfig sharedConfig].requestHelper saveResponseToCacheOfRequest:self];
+    if ([[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(saveResponseToCacheOfRequest:)]) {
+        [[KTNetworkConfig sharedConfig].requestHelper saveResponseToCacheOfRequest:self];
     }
 }
 
 - (void)clearResponseFromCache
 {
-    if ([[VVNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(clearResponseFromCacheOfRequest:)]) {
-        [[VVNetworkConfig sharedConfig].requestHelper clearResponseFromCacheOfRequest:self];
+    if ([[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(clearResponseFromCacheOfRequest:)]) {
+        [[KTNetworkConfig sharedConfig].requestHelper clearResponseFromCacheOfRequest:self];
     }
 }
 
@@ -187,14 +186,14 @@
 - (NSString *)curlRequest
 {
     NSURLRequest *request = self.requestTask.currentRequest;
-    return [VVBaseRequest makeCURLWithRequest:request];
+    return [KTBaseRequest makeCURLWithRequest:request];
 }
 
 + (NSString *)makeCURLWithRequest:(NSURLRequest *)request {
 #warning TODO 0225
 	return nil;
 	
-//    NSURLSession *session = VVRequestManager.manager.sharedSession;
+//    NSURLSession *session = KTRequestManager.manager.sharedSession;
 //    NSMutableArray *components = @[@"curl "].mutableCopy;
 //
 //    NSURL *URL = request.URL;

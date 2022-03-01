@@ -1,12 +1,12 @@
 //
 //  VVMockManager.m
-//  vv_rootlib_ios
+//  KOTU
 //
 //  Created by KOTU on 2019/11/15.
 //
 
 #import "VVMockManager.h"
-#import "VVBaseRequest.h"
+#import "KTBaseRequest.h"
 
 #warning TODO 0225
 
@@ -19,7 +19,7 @@
 //    mockApiConfig = config;
 //}
 //
-//+ (BOOL)matchRequest:(__kindof VVBaseRequest *)request
+//+ (BOOL)matchRequest:(__kindof KTBaseRequest *)request
 //                 url:(NSString *)url
 //{
 //    return [self matchMethod:request]
@@ -28,7 +28,7 @@
 //    && [self matchBody:request];
 //}
 //
-//+ (BOOL)matchMethod:(__kindof VVBaseRequest *)request
+//+ (BOOL)matchMethod:(__kindof KTBaseRequest *)request
 //{
 //    NSString *httpMethod1 = [self httpMethodWithRequest:request];
 //    NSArray *array = [request.requestUrl componentsSeparatedByString:@"?"];
@@ -40,7 +40,7 @@
 //    return NO;
 //}
 //
-//+ (BOOL)matchQueryKeyParams:(__kindof VVBaseRequest *)request
+//+ (BOOL)matchQueryKeyParams:(__kindof KTBaseRequest *)request
 //                        url:(NSString *)url
 //{
 //    NSDictionary *params = [self paramsWithURL:url];
@@ -63,7 +63,7 @@
 //    return YES;
 //}
 //
-//+ (BOOL)matchesHeaders:(__kindof VVBaseRequest *)request
+//+ (BOOL)matchesHeaders:(__kindof KTBaseRequest *)request
 //{
 //    NSArray *array = [request.requestUrl componentsSeparatedByString:@"?"];
 //    NSString *apiName = array.firstObject;
@@ -85,7 +85,7 @@
 //    return YES;
 //}
 //
-//+ (BOOL)matchBody:(__kindof VVBaseRequest *)request
+//+ (BOOL)matchBody:(__kindof KTBaseRequest *)request
 //{
 //    NSArray *array = [request.requestUrl componentsSeparatedByString:@"?"];
 //    NSString *apiName = array.firstObject;
@@ -145,30 +145,30 @@
 //    return bodyParams;
 //}
 //
-//+ (NSString *)httpMethodWithRequest:(__kindof VVBaseRequest *)request
+//+ (NSString *)httpMethodWithRequest:(__kindof KTBaseRequest *)request
 //{
 //    switch (request.requestMethod) {
-//        case VVRequestMethodGET:
+//        case KTRequestMethodGET:
 //            return @"GET";
 //            break;
 //
-//        case VVRequestMethodPOST:
+//        case KTRequestMethodPOST:
 //            return @"POST";
 //            break;
 //
-//        case VVRequestMethodHEAD:
+//        case KTRequestMethodHEAD:
 //             return @"HEAD";
 //             break;
 //
-//        case VVRequestMethodPUT:
+//        case KTRequestMethodPUT:
 //             return @"PUT";
 //             break;
 //
-//        case VVRequestMethodDELETE:
+//        case KTRequestMethodDELETE:
 //             return @"DELETE";
 //             break;
 //
-//        case VVRequestMethodPATCH:
+//        case KTRequestMethodPATCH:
 //             return @"PATCH";
 //             break;
 //

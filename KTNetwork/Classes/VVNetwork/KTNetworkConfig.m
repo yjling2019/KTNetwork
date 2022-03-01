@@ -1,26 +1,25 @@
 //
-//  VVNetworkConfig.m
-//  VVRootLib
+//  KTNetworkConfig.m
+//  KOTU
 //
 //  Created by KOTU on 2019/9/10.
-//  Copyright © 2019 com.lebby.www. All rights reserved.
 //
 
-#import "VVNetworkConfig.h"
+#import "KTNetworkConfig.h"
 
-@interface VVNetworkConfig()
+@interface KTNetworkConfig()
 
-@property (nonatomic, strong, readwrite, nullable) id<VVRequestHelperProtocol> requestHelper;
+@property (nonatomic, strong, readwrite, nullable) id<KTRequestHelperProtocol> requestHelper;
 
 @property (nonatomic, copy, readwrite) NSString *incompleteCacheFolder;
 
 @end
 
-@implementation VVNetworkConfig
+@implementation KTNetworkConfig
 
 + (instancetype)sharedConfig
 {
-    static VVNetworkConfig *_networkConfig = nil;
+    static KTNetworkConfig *_networkConfig = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         _networkConfig = [[self alloc] init];
@@ -39,7 +38,7 @@
     return self;
 }
 
-- (void)configRequestHelper:(id<VVRequestHelperProtocol>)requestHelper
+- (void)configRequestHelper:(id<KTRequestHelperProtocol>)requestHelper
 {
     self.requestHelper = requestHelper;
 }
@@ -67,7 +66,7 @@
 {
     if (!_downloadFolderPath) {
         NSString *documentPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-       NSString *downloadFolder = [documentPath stringByAppendingPathComponent:@"VVNetworking_download"];
+       NSString *downloadFolder = [documentPath stringByAppendingPathComponent:@"KTNetworking_download"];
         NSFileManager *fileManager = [NSFileManager defaultManager];
         NSError *error = nil;
         if(![fileManager createDirectoryAtPath:downloadFolder withIntermediateDirectories:YES attributes:nil error:&error]) {

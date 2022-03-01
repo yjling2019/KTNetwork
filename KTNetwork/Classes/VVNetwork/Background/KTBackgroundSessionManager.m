@@ -1,17 +1,17 @@
 //
-//  VVBackgroundSessionManager.m
-//  vv_rootlib_ios
+//  KTBackgroundSessionManager.m
+//  KOTU
 //
 //  Created by KOTU on 2020/12/12.
 //
 
-#import "VVBackgroundSessionManager.h"
-#import "VVNetworkTaskDelegate.h"
-#import "VVBaseRequest+Private.h"
+#import "KTBackgroundSessionManager.h"
+#import "KTNetworkTaskDelegate.h"
+#import "KTBaseRequest+Private.h"
 
-static NSString * const kVVNetwork_background_task_identifier = @"kVVNetwork_background_task_identifier";
+static NSString * const kKTNetwork_background_task_identifier = @"kKTNetwork_background_task_identifier";
 
-@interface VVBackgroundSessionManager()<NSURLSessionDataDelegate,NSURLSessionDownloadDelegate>
+@interface KTBackgroundSessionManager()<NSURLSessionDataDelegate,NSURLSessionDownloadDelegate>
 
 /// the background url task identifer
 @property (nonatomic, copy, readwrite, nonnull) NSString *backgroundTaskIdentifier;
@@ -23,7 +23,7 @@ static NSString * const kVVNetwork_background_task_identifier = @"kVVNetwork_bac
 
 @end
 
-@implementation VVBackgroundSessionManager
+@implementation KTBackgroundSessionManager
 
 - (instancetype)init
 {
@@ -142,7 +142,7 @@ static NSString * const kVVNetwork_background_task_identifier = @"kVVNetwork_bac
     }
 }
 
-- (NSURLSessionTask *)dataTaskWithDownloadRequest:(__kindof VVBaseDownloadRequest *)request
+- (NSURLSessionTask *)dataTaskWithDownloadRequest:(__kindof KTBaseDownloadRequest *)request
                                 requestSerializer:(AFHTTPRequestSerializer *)requestSerializer
                                         URLString:(NSString *)URLString
                                        parameters:(id)parameters
@@ -171,7 +171,7 @@ static NSString * const kVVNetwork_background_task_identifier = @"kVVNetwork_bac
             sessionTask = [self.backgroundURLSession downloadTaskWithRequest:urlRequest];
         }
         request.requestTask = sessionTask;
-        VVNetworkBackgroundDownloadTaskDelegate *taskDelegate = [[VVNetworkBackgroundDownloadTaskDelegate alloc] initWithRequest:request];
+        KTNetworkBackgroundDownloadTaskDelegate *taskDelegate = [[KTNetworkBackgroundDownloadTaskDelegate alloc] initWithRequest:request];
         taskDelegate.downloadProgressBlock = downloadProgressBlock;
         taskDelegate.completionHandler = completionHandler;
         self.taskIdentifierAndDelegateDic[@(sessionTask.taskIdentifier)] = taskDelegate;
@@ -184,7 +184,7 @@ static NSString * const kVVNetwork_background_task_identifier = @"kVVNetwork_bac
             sessionTask = [self.backgroundURLSession dataTaskWithRequest:urlRequest];
         }
         request.requestTask = sessionTask;
-        VVNetworkDownloadTaskDelegate *taskDelegate = [[VVNetworkDownloadTaskDelegate alloc] initWithRequest:request];
+        KTNetworkDownloadTaskDelegate *taskDelegate = [[KTNetworkDownloadTaskDelegate alloc] initWithRequest:request];
         taskDelegate.downloadProgressBlock = downloadProgressBlock;
         taskDelegate.completionHandler = completionHandler;
         self.taskIdentifierAndDelegateDic[@(sessionTask.taskIdentifier)] = taskDelegate;
@@ -196,9 +196,9 @@ static NSString * const kVVNetwork_background_task_identifier = @"kVVNetwork_bac
 - (BOOL)needHandleBackgroundTask
 {
     [self.lock lock];
-    NSArray <__kindof VVNetworkBaseDownloadTaskDelegate *>*delegates = [self.taskIdentifierAndDelegateDic allValues];
+    NSArray <__kindof KTNetworkBaseDownloadTaskDelegate *>*delegates = [self.taskIdentifierAndDelegateDic allValues];
     [self.lock unlock];
-    for (__kindof VVNetworkBaseDownloadTaskDelegate *delegate in delegates) {
+    for (__kindof KTNetworkBaseDownloadTaskDelegate *delegate in delegates) {
         if (delegate.request.backgroundPolicy == VVDownloadBackgroundDefault) {
             return YES;
         }
@@ -211,7 +211,7 @@ static NSString * const kVVNetwork_background_task_identifier = @"kVVNetwork_bac
 - (void)applicationDidEnterBackground:(NSNotification *)notif
 {
     if ([self needHandleBackgroundTask]) {
-     __block UIBackgroundTaskIdentifier background_identifier = [[UIApplication sharedApplication] beginBackgroundTaskWithName:kVVNetwork_background_task_identifier expirationHandler:^{
+     __block UIBackgroundTaskIdentifier background_identifier = [[UIApplication sharedApplication] beginBackgroundTaskWithName:kKTNetwork_background_task_identifier expirationHandler:^{
          [[UIApplication sharedApplication] endBackgroundTask:background_identifier];
          background_identifier = UIBackgroundTaskInvalid;
         }];

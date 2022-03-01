@@ -1,20 +1,20 @@
 //
-//  VVNetworkTaskDelegate.m
-//  vv_rootlib_ios
+//  KTNetworkTaskDelegate.m
+//  KOTU
 //
 //  Created by KOTU on 2020/12/4.
 //
 
-#import "VVNetworkTaskDelegate.h"
+#import "KTNetworkTaskDelegate.h"
 #import "TDScope.h"
 
-@interface VVNetworkBaseDownloadTaskDelegate()
-@property (nonatomic, weak, readwrite) __kindof VVBaseDownloadRequest *request;
+@interface KTNetworkBaseDownloadTaskDelegate()
+@property (nonatomic, weak, readwrite) __kindof KTBaseDownloadRequest *request;
 @end
 
-@implementation VVNetworkBaseDownloadTaskDelegate
+@implementation KTNetworkBaseDownloadTaskDelegate
 
-- (instancetype)initWithRequest:(__kindof VVBaseDownloadRequest *)request
+- (instancetype)initWithRequest:(__kindof KTBaseDownloadRequest *)request
 {
     self = [super init];
     if (self) {
@@ -31,7 +31,7 @@
 @end
 
 
-@interface VVNetworkDownloadTaskDelegate()
+@interface KTNetworkDownloadTaskDelegate()
 
 @property (nonatomic, copy) NSString *downloadTargetPath;
 @property (nonatomic, copy) NSString *tempPath;
@@ -43,9 +43,9 @@
 
 @end
 
-@implementation VVNetworkDownloadTaskDelegate
+@implementation KTNetworkDownloadTaskDelegate
 
-- (instancetype)initWithRequest:(__kindof VVBaseDownloadRequest *)request
+- (instancetype)initWithRequest:(__kindof KTBaseDownloadRequest *)request
 {
     self = [super initWithRequest:request];
     if (self) {
@@ -161,7 +161,7 @@ didCompleteWithError:(NSError *)error
         [self.fileHandle writeData:data error:&error];
         if (error) {
 #if DEBUG
-            NSLog(@"VVNetwork_downloadError:%@",error.description);
+            NSLog(@"KTNetwork_downloadError:%@",error.description);
 #endif
         }
     } else {
@@ -173,7 +173,7 @@ didCompleteWithError:(NSError *)error
 @end
 
 
-@interface VVNetworkBackgroundDownloadTaskDelegate()
+@interface KTNetworkBackgroundDownloadTaskDelegate()
 
 @property (nonatomic, copy) NSString *downloadTargetPath;
 @property (nonatomic, strong) NSProgress *progress;
@@ -184,9 +184,9 @@ didCompleteWithError:(NSError *)error
 
 @end
 
-@implementation VVNetworkBackgroundDownloadTaskDelegate
+@implementation KTNetworkBackgroundDownloadTaskDelegate
 
-- (instancetype)initWithRequest:(__kindof VVBaseDownloadRequest *)request
+- (instancetype)initWithRequest:(__kindof KTBaseDownloadRequest *)request
 {
     self = [super initWithRequest:request];
     if (self) {

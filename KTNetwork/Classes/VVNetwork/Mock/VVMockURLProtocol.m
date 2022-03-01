@@ -1,6 +1,6 @@
 //
 //  VVMockURLProtocol.m
-//  vv_rootlib_ios
+//  KOTU
 //
 //  Created by KOTU on 2019/11/15.
 //
@@ -9,7 +9,7 @@
 //#import <AFNetworking/AFNetworking.h>
 #import <AFNetworking/AFHTTPSessionManager.h>
 
-#import "VVNetworkConfig.h"
+#import "KTNetworkConfig.h"
 #import "VVMockManager.h"
 //#import "VVDataHelper.h"
 
@@ -36,7 +36,7 @@
 //
 //+ (BOOL)canInitWithRequest:(NSURLRequest *)request
 //{
-//    if (![VVNetworkConfig sharedConfig].isMock) {
+//    if (![KTNetworkConfig sharedConfig].isMock) {
 //        return NO;
 //    }
 //    if ([self matchMethod:request]
@@ -62,7 +62,7 @@
 //    } else {
 //        baseUrl = [NSString stringWithFormat:@"%@://%@",scheme,host];
 //    }
-//    url = [url stringByReplacingOccurrencesOfString:baseUrl withString:[VVNetworkConfig sharedConfig].mockBaseUrl];
+//    url = [url stringByReplacingOccurrencesOfString:baseUrl withString:[KTNetworkConfig sharedConfig].mockBaseUrl];
 //    NSURL *mockUrl = [NSURL URLWithString:url];
 //    [newRequest setURL:mockUrl];
 //    return newRequest;

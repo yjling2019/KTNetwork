@@ -1,19 +1,19 @@
 //
-//  VVBatchRequest.h
+//  KTBatchRequest.h
 //  KTNetwork
 //
-//  Created by 凌永剑 on 2022/2/25.
+//  Created by KOTU on 2022/2/25.
 //
 
-#import "VVGroupRequest.h"
+#import "KTGroupRequest.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class VVBatchRequest;
+@class KTBatchRequest;
 
-typedef void(^KTBatchRequestBlock)(VVBatchRequest *batchRequest);
+typedef void(^KTBatchRequestBlock)(KTBatchRequest *batchRequest);
 
-@interface VVBatchRequest : VVGroupRequest
+@interface KTBatchRequest : KTGroupRequest
 
 /*
  config the require success requests
@@ -21,7 +21,7 @@ typedef void(^KTBatchRequestBlock)(VVBatchRequest *batchRequest);
  if config the requests,only the requests in the config requests all success,then the batchRequest success block will be called,if one of request in config request failed,the batchRequest fail block will be called.
  this method should invoke after you add the request in the batchRequest.
  */
-- (void)configRequireSuccessRequests:(nullable NSArray <__kindof NSObject <VVGroupChildRequestProtocol> *> *)requests;
+- (void)configRequireSuccessRequests:(nullable NSArray <__kindof NSObject <KTGroupChildRequestProtocol> *> *)requests;
 
 - (void)startWithCompletionSuccess:(nullable KTBatchRequestBlock)successBlock
 						   failure:(nullable KTBatchRequestBlock)failureBlock;

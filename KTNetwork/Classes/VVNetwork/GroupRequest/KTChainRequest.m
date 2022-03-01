@@ -1,27 +1,27 @@
 //
-//  VVChainRequest.m
+//  KTChainRequest.m
 //  KTNetwork
 //
-//  Created by 凌永剑 on 2022/2/25.
+//  Created by KOTU on 2022/2/25.
 //
 
-#import "VVChainRequest.h"
-#import "VVNetworkAgent.h"
+#import "KTChainRequest.h"
+#import "KTNetworkAgent.h"
 #import "TDScope.h"
-#import "VVBaseRequest+Private.h"
-#import "VVGroupRequest+Private.h"
-#import "VVBaseRequest+Group.h"
-#import "VVBaseDownloadRequest.h"
-#import "VVBaseUploadRequest.h"
+#import "KTBaseRequest+Private.h"
+#import "KTGroupRequest+Private.h"
+#import "KTBaseRequest+Group.h"
+#import "KTBaseDownloadRequest.h"
+#import "KTBaseUploadRequest.h"
 
-@interface VVChainRequest()
+@interface KTChainRequest()
 
-@property (nonatomic, strong, nullable) id <VVGroupChildRequestProtocol> lastRequest;
+@property (nonatomic, strong, nullable) id <KTGroupChildRequestProtocol> lastRequest;
 @property (nonatomic, assign, readonly) BOOL canStartNextRequest;
 
 @end
 
-@implementation VVChainRequest
+@implementation KTChainRequest
 
 - (void)start
 {
@@ -50,16 +50,16 @@
 	self.finishedCount = 0;
 	self.failedRequests = nil;
 	self.lastRequest = nil;
-	[[VVNetworkAgent sharedAgent] removeChainRequest:self];
+	[[KTNetworkAgent sharedAgent] removeChainRequest:self];
 	self.executing = NO;
 }
 
-- (void)startWithCompletionSuccess:(nullable void (^)(VVChainRequest *chainRequest))successBlock
-						   failure:(nullable void (^)(VVChainRequest *chainRequest))failureBlock
+- (void)startWithCompletionSuccess:(nullable void (^)(KTChainRequest *chainRequest))successBlock
+						   failure:(nullable void (^)(KTChainRequest *chainRequest))failureBlock
 {
 	self.groupSuccessBlock = successBlock;
 	self.groupFailureBlock = failureBlock;
-	[[VVNetworkAgent sharedAgent] addChainRequest:self];
+	[[KTNetworkAgent sharedAgent] addChainRequest:self];
 }
 
 - (void)inAdvanceCompleteWithResult:(BOOL)isSuccess
@@ -84,34 +84,34 @@
 - (void)startNextRequest
 {
 	if (self.canStartNextRequest) {
-		VVBaseRequest *request = self.requestArray[self.finishedCount];
+		KTBaseRequest *request = self.requestArray[self.finishedCount];
 		self.finishedCount++;
-		if ([request isKindOfClass:[VVBaseUploadRequest class]]) {
-			VVBaseUploadRequest *uploadRequest = (VVBaseUploadRequest *)request;
+		if ([request isKindOfClass:[KTBaseUploadRequest class]]) {
+			KTBaseUploadRequest *uploadRequest = (KTBaseUploadRequest *)request;
 			@weakify(self);
-			[uploadRequest uploadWithProgress:uploadRequest.progressBlock formDataBlock:uploadRequest.formDataBlock success:^(__kindof VVBaseRequest * _Nonnull request) {
+			[uploadRequest uploadWithProgress:uploadRequest.progressBlock formDataBlock:uploadRequest.formDataBlock success:^(__kindof KTBaseRequest * _Nonnull request) {
 				@strongify(self);
 				[self handleSuccessOfRequest:request];
-			} failure:^(__kindof VVBaseRequest * _Nonnull request) {
+			} failure:^(__kindof KTBaseRequest * _Nonnull request) {
 				@strongify(self);
 				[self handleFailureOfRequest:request];
 			}];
-		} else if ([request isKindOfClass:[VVBaseDownloadRequest class]]) {
-			VVBaseDownloadRequest *downloadRequest = (VVBaseDownloadRequest *)request;
+		} else if ([request isKindOfClass:[KTBaseDownloadRequest class]]) {
+			KTBaseDownloadRequest *downloadRequest = (KTBaseDownloadRequest *)request;
 			@weakify(self);
-			[downloadRequest downloadWithProgress:downloadRequest.progressBlock success:^(__kindof VVBaseRequest * _Nonnull request) {
+			[downloadRequest downloadWithProgress:downloadRequest.progressBlock success:^(__kindof KTBaseRequest * _Nonnull request) {
 				@strongify(self);
 				[self handleSuccessOfRequest:request];
-			} failure:^(__kindof VVBaseRequest * _Nonnull request) {
+			} failure:^(__kindof KTBaseRequest * _Nonnull request) {
 				@strongify(self);
 				[self handleFailureOfRequest:request];
 			}];
 		} else {
 			@weakify(self);
-			[request startWithCompletionSuccess:^(__kindof VVBaseRequest * _Nonnull request) {
+			[request startWithCompletionSuccess:^(__kindof KTBaseRequest * _Nonnull request) {
 				@strongify(self);
 				[self handleSuccessOfRequest:request];
-			} failure:^(__kindof VVBaseRequest * _Nonnull request) {
+			} failure:^(__kindof KTBaseRequest * _Nonnull request) {
 				@strongify(self);
 				[self handleFailureOfRequest:request];
 			}];
@@ -119,7 +119,7 @@
 	}
 }
 
-- (void)handleSuccessOfRequest:(__kindof VVBaseRequest *)request
+- (void)handleSuccessOfRequest:(__kindof KTBaseRequest *)request
 {
 	self.lastRequest = request;
 	if (request.successBlock) {
@@ -140,7 +140,7 @@
 	}
 }
 
-- (void)handleFailureOfRequest:(__kindof VVBaseRequest *)request
+- (void)handleFailureOfRequest:(__kindof KTBaseRequest *)request
 {
 	if (!self.failedRequests) {
 		self.failedRequests = [NSMutableArray new];
@@ -153,7 +153,7 @@
 			return;
 		}
 	}
-	for (id <VVGroupChildRequestProtocol> tmpRequest in [self.requestArray copy]) {
+	for (id <KTGroupChildRequestProtocol> tmpRequest in [self.requestArray copy]) {
 		[tmpRequest stop];
 	}
 	[self handleAccessoryWithBlock:^{

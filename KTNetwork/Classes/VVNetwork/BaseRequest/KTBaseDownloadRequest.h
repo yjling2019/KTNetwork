@@ -1,15 +1,15 @@
 //
-//  VVBaseDownloadRequest.h
+//  KTBaseDownloadRequest.h
 //  KTNetwork
 //
-//  Created by 凌永剑 on 2022/2/25.
+//  Created by KOTU on 2022/2/25.
 //
 
-#import "VVBaseRequest.h"
+#import "KTBaseRequest.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VVBaseDownloadRequest :VVBaseRequest
+@interface KTBaseDownloadRequest :KTBaseRequest
 
 /// the url of the download file resoure
 @property (nonatomic, copy, readonly) NSString *absoluteString;
@@ -31,8 +31,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param successBlock successBlock
 /// @param failureBlock failureBlock
 - (void)downloadWithProgress:(nullable void(^)(NSProgress *downloadProgress))downloadProgressBlock
-					 success:(nullable void(^)(__kindof VVBaseRequest *request))successBlock
-					 failure:(nullable void(^)(__kindof VVBaseRequest *request))failureBlock;
+					 success:(nullable void(^)(__kindof KTBaseRequest *request))successBlock
+					 failure:(nullable void(^)(__kindof KTBaseRequest *request))failureBlock;
 
 @end
 

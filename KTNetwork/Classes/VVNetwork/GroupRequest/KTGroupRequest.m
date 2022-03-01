@@ -1,18 +1,18 @@
 //
-//  VVGroupRequest.m
-//  vv_rootlib_ios
+//  KTGroupRequest.m
+//  KOTU
 //
 //  Created by KOTU on 2019/11/15.
 //
 
-#import "VVGroupRequest.h"
-#import "VVNetworkAgent.h"
+#import "KTGroupRequest.h"
+#import "KTNetworkAgent.h"
 #import "TDScope.h"
-#import "VVBaseRequest+Private.h"
-#import "VVGroupRequest+Private.h"
-#import "VVBaseRequest+Group.h"
+#import "KTBaseRequest+Private.h"
+#import "KTGroupRequest+Private.h"
+#import "KTBaseRequest+Group.h"
 
-@implementation VVGroupRequest
+@implementation KTGroupRequest
 
 @synthesize groupRequest = _groupRequest;
 @synthesize successBlock = _successBlock;
@@ -28,11 +28,11 @@
     return self;
 }
 
-- (void)addRequest:(id <VVGroupChildRequestProtocol>)request
+- (void)addRequest:(id <KTGroupChildRequestProtocol>)request
 {
-    if (![request conformsToProtocol:@protocol(VVGroupChildRequestProtocol)]) {
+    if (![request conformsToProtocol:@protocol(KTGroupChildRequestProtocol)]) {
 #if DEBUG
-        NSAssert(NO, @"makesure request is conforms to protocol VVRequestInGroupProtocol");
+        NSAssert(NO, @"makesure request is conforms to protocol KTRequestInGroupProtocol");
 #endif
         return;
     }
@@ -46,7 +46,7 @@
     [self.requestArray addObject:request];
 }
 
-- (void)addRequestsWithArray:(NSArray <id <VVGroupChildRequestProtocol>> *)requestArray
+- (void)addRequestsWithArray:(NSArray <id <KTGroupChildRequestProtocol>> *)requestArray
 {
     NSMutableSet *tmpSet = [NSMutableSet setWithArray:requestArray];
     if (tmpSet.count != requestArray.count) {
@@ -63,7 +63,7 @@
 #endif
         return;
     }
-    for (id <VVGroupChildRequestProtocol> request in requestArray) {
+    for (id <KTGroupChildRequestProtocol> request in requestArray) {
         [self addRequest:request];
     }
 }
@@ -83,7 +83,7 @@
     
 }
 
-#pragma mark - - VVRequestInGroupProtocol - -
+#pragma mark - - KTRequestInGroupProtocol - -
 - (BOOL)isIndependentRequest
 {
     return self.groupRequest?NO:YES;

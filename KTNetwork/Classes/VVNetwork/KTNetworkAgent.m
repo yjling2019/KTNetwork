@@ -1,33 +1,32 @@
 //
-//  VVNetworkAgent.m
-//  VVRootLib
+//  KTNetworkAgent.m
+//  KOTU
 //
 //  Created by KOTU on 2019/9/10.
-//  Copyright © 2019 com.lebby.www. All rights reserved.
 //
 
-#import "VVNetworkAgent.h"
+#import "KTNetworkAgent.h"
 #import <AFNetworking/AFHTTPSessionManager.h>
-#import "VVBaseRequest.h"
-#import "VVBaseUploadRequest.h"
-#import "VVBaseDownloadRequest.h"
-#import "VVGroupRequest.h"
-#import "VVBatchRequest.h"
-#import "VVChainRequest.h"
-#import "VVNetworkConfig.h"
+#import "KTBaseRequest.h"
+#import "KTBaseUploadRequest.h"
+#import "KTBaseDownloadRequest.h"
+#import "KTGroupRequest.h"
+#import "KTBatchRequest.h"
+#import "KTChainRequest.h"
+#import "KTNetworkConfig.h"
 #import "VVMockManager.h"
-#import "VVBackgroundSessionManager.h"
+#import "KTBackgroundSessionManager.h"
 #import "TDScope.h"
-#import "VVBaseRequest+Private.h"
+#import "KTBaseRequest+Private.h"
 
-@interface VVBaseRequest(VVNetworkAgent)
+@interface KTBaseRequest(KTNetworkAgent)
 
 /// 每次真正发起请求前，重置状态，避免受到上次请求数据的干扰
 - (void)resetOriginStatus;
 
 @end
 
-@implementation VVBaseRequest(VVNetworkAgent)
+@implementation KTBaseRequest(KTNetworkAgent)
 
 /// 每次真正发起请求前，重置状态，避免受到上次请求数据的干扰
 - (void)resetOriginStatus
@@ -43,12 +42,12 @@
 
 @end
 
-@interface VVNetworkAgent()
+@interface KTNetworkAgent()
 {
     dispatch_queue_t _processingQueue;
 }
 
-@property (nonatomic, strong) NSMutableArray <__kindof VVBaseRequest *> *allStartedRequests;
+@property (nonatomic, strong) NSMutableArray <__kindof KTBaseRequest *> *allStartedRequests;
 @property (nonatomic, strong) NSLock *lock;
 @property (nonatomic, strong) AFHTTPSessionManager *sessionManager;
 @property (nonatomic, strong) AFJSONResponseSerializer *jsonResponseSerializer;
@@ -68,15 +67,15 @@
 /// the requests need after priprityFirstRequest fininsed,if the priprityFirstRequest is not nil,
 @property (nonatomic, strong, nonnull) NSMutableArray *bufferRequests;
 
-@property (nonatomic, strong, nonnull) VVBackgroundSessionManager *backgroundSessionMananger;
+@property (nonatomic, strong, nonnull) KTBackgroundSessionManager *backgroundSessionMananger;
 
 @end
 
-@implementation VVNetworkAgent
+@implementation KTNetworkAgent
 
 + (instancetype)sharedAgent
 {
-    static VVNetworkAgent *_networkAgent = nil;
+    static KTNetworkAgent *_networkAgent = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         _networkAgent = [[self alloc] init];
@@ -93,21 +92,21 @@
 		_chainRequests = [NSMutableArray new];
 		_bufferRequests = [NSMutableArray new];
         _lock = [[NSLock alloc] init];
-        _processingQueue =dispatch_queue_create("com.vova.networkAgent.processing", DISPATCH_QUEUE_CONCURRENT);
-        _sessionManager = [[AFHTTPSessionManager alloc] initWithSessionConfiguration:[VVNetworkConfig sharedConfig].sessionConfiguration];
-        _sessionManager.securityPolicy = [VVNetworkConfig sharedConfig].securityPolicy;
+        _processingQueue =dispatch_queue_create("com.kotu.networkAgent.processing", DISPATCH_QUEUE_CONCURRENT);
+        _sessionManager = [[AFHTTPSessionManager alloc] initWithSessionConfiguration:[KTNetworkConfig sharedConfig].sessionConfiguration];
+        _sessionManager.securityPolicy = [KTNetworkConfig sharedConfig].securityPolicy;
         _sessionManager.responseSerializer = [AFHTTPResponseSerializer serializer];
         _allStatusCodes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(100, 500)];
         _sessionManager.completionQueue = _processingQueue;
         _sessionManager.responseSerializer.acceptableStatusCodes = _allStatusCodes;
         _jsonResponseSerializer = [self config_jsonResponseSerializer];
         _xmlParserResponseSerialzier = [self config_xmlParserResponseSerialzier];
-        _backgroundSessionMananger = [VVBackgroundSessionManager new];
+        _backgroundSessionMananger = [KTBackgroundSessionManager new];
     }
     return self;
 }
 
-- (void)addRequest:(__kindof VVBaseRequest *)request
+- (void)addRequest:(__kindof KTBaseRequest *)request
 {
     if (!request) {
 #if DEBUG
@@ -116,24 +115,24 @@
         return;
     }
     
-    if (![request isKindOfClass:[VVBaseRequest class]]) {
+    if (![request isKindOfClass:[KTBaseRequest class]]) {
 #if DEBUG
-        NSAssert(NO, @"please makesure [request isKindOfClass:[VVBaseRequest class]] be YES");
+        NSAssert(NO, @"please makesure [request isKindOfClass:[KTBaseRequest class]] be YES");
 #endif
         return;
     }
 	
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-		if ([[VVNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(beforeAllRequests)]) {
-			[[VVNetworkConfig sharedConfig].requestHelper beforeAllRequests];
+		if ([[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(beforeAllRequests)]) {
+			[[KTNetworkConfig sharedConfig].requestHelper beforeAllRequests];
 		}
     });
     
     if (self.priorityFirstRequest) {
-        if (([self.priorityFirstRequest isKindOfClass:[VVBaseRequest class]] && ![self.priorityFirstRequest isEqual:request])
-            || ([self.priorityFirstRequest isKindOfClass:[VVBatchRequest class]] && ![[(VVBatchRequest *)self.priorityFirstRequest requestArray] containsObject:request])
-            ||([self.priorityFirstRequest isKindOfClass:[VVChainRequest class]] && ![[(VVChainRequest *)self.priorityFirstRequest requestArray] containsObject:request])) {
+        if (([self.priorityFirstRequest isKindOfClass:[KTBaseRequest class]] && ![self.priorityFirstRequest isEqual:request])
+            || ([self.priorityFirstRequest isKindOfClass:[KTBatchRequest class]] && ![[(KTBatchRequest *)self.priorityFirstRequest requestArray] containsObject:request])
+            ||([self.priorityFirstRequest isKindOfClass:[KTChainRequest class]] && ![[(KTChainRequest *)self.priorityFirstRequest requestArray] containsObject:request])) {
             [self.lock lock];
             if (![self.bufferRequests containsObject:request]) {
                [self.bufferRequests addObject:request];
@@ -149,8 +148,8 @@
 	
     [request resetOriginStatus];
 
-	if ([[VVNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(beforeEachRequest:)]) {
-        [[VVNetworkConfig sharedConfig].requestHelper beforeEachRequest:request];
+	if ([[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(beforeEachRequest:)]) {
+        [[KTNetworkConfig sharedConfig].requestHelper beforeEachRequest:request];
     }
 	
     NSError * __autoreleasing requestSerializationError = nil;
@@ -169,7 +168,7 @@
     [request.requestTask resume];
 }
 
-- (void)cancelRequest:(__kindof VVBaseRequest *)request
+- (void)cancelRequest:(__kindof KTBaseRequest *)request
 {
     if (!request) {
 #if DEBUG
@@ -177,9 +176,9 @@
 #endif
         return;
     }
-    if (![request isKindOfClass:[VVBaseRequest class]]) {
+    if (![request isKindOfClass:[KTBaseRequest class]]) {
 #if DEBUG
-        NSAssert(NO, @"please makesure [request isKindOfClass:[VVBaseRequest class]] be YES");
+        NSAssert(NO, @"please makesure [request isKindOfClass:[KTBaseRequest class]] be YES");
 #endif
         return;
     }
@@ -204,14 +203,14 @@
 - (void)cancelAllRequests
 {
     if (self.priorityFirstRequest) {
-        if ([self.priorityFirstRequest isKindOfClass:[VVBaseRequest class]]) {
-            VVBaseRequest *request = (VVBaseRequest *)self.priorityFirstRequest;
+        if ([self.priorityFirstRequest isKindOfClass:[KTBaseRequest class]]) {
+            KTBaseRequest *request = (KTBaseRequest *)self.priorityFirstRequest;
             [request stop];
-        } else if ([self.priorityFirstRequest isKindOfClass:[VVBatchRequest class]]) {
-            VVBatchRequest *request = (VVBatchRequest *)self.priorityFirstRequest;
+        } else if ([self.priorityFirstRequest isKindOfClass:[KTBatchRequest class]]) {
+            KTBatchRequest *request = (KTBatchRequest *)self.priorityFirstRequest;
             [request stop];
-        } else if ([self.priorityFirstRequest isKindOfClass:[VVChainRequest class]]){
-            VVChainRequest *request = (VVChainRequest *)self.priorityFirstRequest;
+        } else if ([self.priorityFirstRequest isKindOfClass:[KTChainRequest class]]){
+            KTChainRequest *request = (KTChainRequest *)self.priorityFirstRequest;
             [request stop];
         }
     }
@@ -226,12 +225,12 @@
     NSArray *allStartedRequests = [self.allStartedRequests copy];
     [self.lock unlock];
     
-    for (__kindof VVBaseRequest *request in allStartedRequests) {
+    for (__kindof KTBaseRequest *request in allStartedRequests) {
         [request stop];
     }
 }
 
-- (NSURLSessionTask *)sessionTaskForRequest:(__kindof VVBaseRequest *)request error:(NSError * _Nullable __autoreleasing *)error
+- (NSURLSessionTask *)sessionTaskForRequest:(__kindof KTBaseRequest *)request error:(NSError * _Nullable __autoreleasing *)error
 {
     NSString *url = nil;
     id param = nil;
@@ -240,12 +239,12 @@
             url = request.signaturedUrl;
             param = request.signaturedParams;
         } else {
-            if ([[VVNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(signatureRequest:)]) {
-                [[VVNetworkConfig sharedConfig].requestHelper signatureRequest:request];
+            if ([[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(signatureRequest:)]) {
+                [[KTNetworkConfig sharedConfig].requestHelper signatureRequest:request];
                 url = request.signaturedUrl;
                 param = request.signaturedParams;
             } else {
-                NSError *signatureError = [NSError errorWithDomain:VVNetworkErrorDomain code:VVNetworkErrorNotSupportSignature userInfo:@{@"msg":@"the requestHelper do not implement selecotr signatureRequest:"}];
+                NSError *signatureError = [NSError errorWithDomain:KTNetworkErrorDomain code:KTNetworkErrorNotSupportSignature userInfo:@{@"msg":@"the requestHelper do not implement selecotr signatureRequest:"}];
                 signatureError = *error;
                 return nil;
             }
@@ -255,7 +254,7 @@
         param = request.requestArgument;
     }
     
-    if ([VVNetworkConfig sharedConfig].isMock) {
+    if ([KTNetworkConfig sharedConfig].isMock) {
         BOOL needMock = [VVMockManager matchRequest:request url:url];
         if (needMock) {
             NSURL *Url = [NSURL URLWithString:url];
@@ -268,21 +267,21 @@
             } else {
 				domain = [NSString stringWithFormat:@"%@://%@",scheme,host];
             }
-           url = [url stringByReplacingOccurrencesOfString:domain withString:[VVNetworkConfig sharedConfig].mockBaseUrl];
+           url = [url stringByReplacingOccurrencesOfString:domain withString:[KTNetworkConfig sharedConfig].mockBaseUrl];
         }
     }
     
     AFHTTPRequestSerializer *requestSerializer = [self requestSerializerForRequest:request];
-    if ([request isKindOfClass:[VVBaseDownloadRequest class]]) {
-        return [self downloadTaskWithRequest:(VVBaseDownloadRequest *)request requestSerializer:requestSerializer URLString:url parameters:param error:error];
-    } else if ([request isKindOfClass:[VVBaseUploadRequest class]]) {
+    if ([request isKindOfClass:[KTBaseDownloadRequest class]]) {
+        return [self downloadTaskWithRequest:(KTBaseDownloadRequest *)request requestSerializer:requestSerializer URLString:url parameters:param error:error];
+    } else if ([request isKindOfClass:[KTBaseUploadRequest class]]) {
         return [self uploadTaskWithRequest:request requestSerializer:requestSerializer URLString:url parameters:param error:error];
 	} else {
 		return [self dataTaskWithRequest:request requestSerializer:requestSerializer URLString:url parameters:param error:error];
 	}
 }
 
-- (NSURLSessionTask *)downloadTaskWithRequest:(__kindof VVBaseDownloadRequest *)request
+- (NSURLSessionTask *)downloadTaskWithRequest:(__kindof KTBaseDownloadRequest *)request
                             requestSerializer:(AFHTTPRequestSerializer *)requestSerializer
                                     URLString:(NSString *)URLString
                                     parameters:(id)parameters
@@ -294,7 +293,7 @@
     return dataTask;
 }
 
-- (NSURLSessionDataTask *)uploadTaskWithRequest:(__kindof VVBaseUploadRequest *)request
+- (NSURLSessionDataTask *)uploadTaskWithRequest:(__kindof KTBaseUploadRequest *)request
                                 requestSerializer:(AFHTTPRequestSerializer *)requestSerializer
                                         URLString:(NSString *)URLString
                                        parameters:(id)parameters
@@ -309,7 +308,7 @@
     return dataTask;
 }
 
-- (NSURLSessionDataTask *)dataTaskWithRequest:(__kindof VVBaseRequest *)request
+- (NSURLSessionDataTask *)dataTaskWithRequest:(__kindof KTBaseRequest *)request
                             requestSerializer:(AFHTTPRequestSerializer *)requestSerializer
                                     URLString:(NSString *)URLString
                                    parameters:(id)parameters
@@ -317,32 +316,32 @@
 {
     NSString *method = nil;
     switch (request.requestMethod) {
-        case VVRequestMethodGET:
+        case KTRequestMethodGET:
         {
             method = @"GET";
         }
             break;
-        case VVRequestMethodPOST:
+        case KTRequestMethodPOST:
         {
             method = @"POST";
         }
             break;
-        case VVRequestMethodHEAD:
+        case KTRequestMethodHEAD:
         {
             method = @"HEAD";
         }
             break;
-        case VVRequestMethodPUT:
+        case KTRequestMethodPUT:
         {
             method = @"PUT";
         }
             break;
-        case VVRequestMethodDELETE:
+        case KTRequestMethodDELETE:
         {
             method = @"DELETE";
         }
             break;
-        case VVRequestMethodPATCH:
+        case KTRequestMethodPATCH:
         {
             method = @"PATCH";
         }
@@ -358,7 +357,7 @@
     return dataTask;
 }
 
-- (void)handleResultWithRequest:(__kindof VVBaseRequest *)request error:(NSError *)error
+- (void)handleResultWithRequest:(__kindof KTBaseRequest *)request error:(NSError *)error
 {
     if (!request) {
         return;
@@ -368,23 +367,23 @@
     NSError *requestError = nil;
     BOOL succeed = NO;
     
-    if (![request isKindOfClass:[VVBaseDownloadRequest class]]) {
+    if (![request isKindOfClass:[KTBaseDownloadRequest class]]) {
 		NSData *responseData = nil;
 		if ([request.responseObject isKindOfClass:[NSData class]]) {
 			responseData = (NSData *)request.responseObject;
 		}
 		switch (request.responseSerializerType) {
-			case VVResponseSerializerTypeHTTP:
+			case KTResponseSerializerTypeHTTP:
 	//            defalut serializer. do nothing
 				break;
 				
-			case VVResponseSerializerTypeJSON: {
+			case KTResponseSerializerTypeJSON: {
 				request.responseObject = [self.jsonResponseSerializer responseObjectForResponse:request.requestTask.response data:responseData error:&serializationError];
 				request.responseJSONObject = request.responseObject;
 			}
 				break;
 			
-			case VVResponseSerializerTypeXMLParser: {
+			case KTResponseSerializerTypeXMLParser: {
 				request.responseObject = [self.xmlParserResponseSerialzier responseObjectForResponse:request.requestTask.response data:responseData error:&serializationError];
 			}
 				break;
@@ -401,8 +400,8 @@
         succeed = NO;
         requestError = serializationError;
     } else {
-        if (request.responseSerializerType == VVResponseSerializerTypeHTTP
-            || request.responseSerializerType == VVResponseSerializerTypeJSON) {
+        if (request.responseSerializerType == KTResponseSerializerTypeHTTP
+            || request.responseSerializerType == KTResponseSerializerTypeJSON) {
             succeed = [self validateResult:request error:&validationError];
             requestError = validationError;
         }
@@ -413,8 +412,8 @@
     } else {
         [self requestDidFailWithRequest:request error:requestError];
     }
-    if ([[VVNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(afterEachRequest:)]) {
-        [[VVNetworkConfig sharedConfig].requestHelper afterEachRequest:request];
+    if ([[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(afterEachRequest:)]) {
+        [[KTNetworkConfig sharedConfig].requestHelper afterEachRequest:request];
     }
 #if DEBUG
     [self printRequestDescription:request];
@@ -428,9 +427,9 @@
     });
 }
 
-- (BOOL)validateResult:(__kindof VVBaseRequest *)request error:(NSError * _Nullable __autoreleasing *)error
+- (BOOL)validateResult:(__kindof KTBaseRequest *)request error:(NSError * _Nullable __autoreleasing *)error
 {
-    if ([request isKindOfClass:[VVBaseDownloadRequest class]]) {
+    if ([request isKindOfClass:[KTBaseDownloadRequest class]]) {
         return YES;
     }
     BOOL result = YES;
@@ -439,7 +438,7 @@
     if (json && validator) {
 		result = [self validateJSON:json withValidator:validator];
         if (!result) {
-            NSError *tmpError = [[NSError alloc] initWithDomain:VVNetworkErrorDomain code:VVNetworkErrorInvalidJSONFormat userInfo:@{NSLocalizedDescriptionKey:@"validateResult failed",@"extra":request.responseJSONObject?:@{}}];
+            NSError *tmpError = [[NSError alloc] initWithDomain:KTNetworkErrorDomain code:KTNetworkErrorInvalidJSONFormat userInfo:@{NSLocalizedDescriptionKey:@"validateResult failed",@"extra":request.responseJSONObject?:@{}}];
             if (error != NULL) {
 				*error = tmpError;
             }
@@ -452,13 +451,13 @@
     return result;
 }
 
-- (void)requestDidSucceedWithRequest:(__kindof VVBaseRequest *)request
+- (void)requestDidSucceedWithRequest:(__kindof KTBaseRequest *)request
 {
 	@autoreleasepool {
 		BOOL needExtraHandle = [request requestSuccessPreHandle];
         if (needExtraHandle) {
-			if ([VVNetworkConfig sharedConfig].requestHelper && [[VVNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(preHandleSuccessRequest:)]) {
-				[[VVNetworkConfig sharedConfig].requestHelper preHandleSuccessRequest:request];
+			if ([KTNetworkConfig sharedConfig].requestHelper && [[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(preHandleSuccessRequest:)]) {
+				[[KTNetworkConfig sharedConfig].requestHelper preHandleSuccessRequest:request];
             }
         }
     }
@@ -481,15 +480,15 @@
     });
 }
 
-- (void)requestDidFailWithRequest:(__kindof VVBaseRequest *)request error:(NSError *)error
+- (void)requestDidFailWithRequest:(__kindof KTBaseRequest *)request error:(NSError *)error
 {
     request.error = error;
 	
     @autoreleasepool {
        BOOL needExtraHandle = [request requestFailurePreHandle];
         if (needExtraHandle) {
-            if ([VVNetworkConfig sharedConfig].requestHelper && [[VVNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(preHandleFailureRequest:)]) {
-                [[VVNetworkConfig sharedConfig].requestHelper preHandleFailureRequest:request];
+            if ([KTNetworkConfig sharedConfig].requestHelper && [[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(preHandleFailureRequest:)]) {
+                [[KTNetworkConfig sharedConfig].requestHelper preHandleFailureRequest:request];
             }
         }
     }
@@ -512,14 +511,14 @@
     });
 }
 
-- (NSString *)buildRequestUrl:(__kindof VVBaseRequest *)request
+- (NSString *)buildRequestUrl:(__kindof KTBaseRequest *)request
 {
     NSString *urlStr = [request buildCustomRequestUrl];
     if (!urlStr || (urlStr && [urlStr isKindOfClass:[NSString class]] && urlStr.length == 0)) {
         NSString *detailUrl = [request requestUrl];
         
-        if ([[VVNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(filterUrl:withRequest:)]) {
-			detailUrl = [[VVNetworkConfig sharedConfig].requestHelper filterUrl:detailUrl withRequest:request];
+        if ([[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(filterUrl:withRequest:)]) {
+			detailUrl = [[KTNetworkConfig sharedConfig].requestHelper filterUrl:detailUrl withRequest:request];
         }
         
         NSString *baseUrl = @"";
@@ -527,20 +526,20 @@
             if (request.cdnBaseUrl.length > 0) {
                 baseUrl = request.cdnBaseUrl;
             } else {
-                if ([[VVNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(baseUrlOfRequest:)]) {
-                     baseUrl = [[VVNetworkConfig sharedConfig].requestHelper baseUrlOfRequest:request];
+                if ([[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(baseUrlOfRequest:)]) {
+                     baseUrl = [[KTNetworkConfig sharedConfig].requestHelper baseUrlOfRequest:request];
                 } else {
-                    baseUrl = [VVNetworkConfig sharedConfig].cdnBaseUrl;
+                    baseUrl = [KTNetworkConfig sharedConfig].cdnBaseUrl;
                 }
             }
         } else{
             if (request.baseUrl.length > 0) {
                 baseUrl = request.baseUrl;
             } else {
-                if ([[VVNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(baseUrlOfRequest:)]) {
-                     baseUrl = [[VVNetworkConfig sharedConfig].requestHelper baseUrlOfRequest:request];
+                if ([[KTNetworkConfig sharedConfig].requestHelper respondsToSelector:@selector(baseUrlOfRequest:)]) {
+                     baseUrl = [[KTNetworkConfig sharedConfig].requestHelper baseUrlOfRequest:request];
                 }else {
-                     baseUrl = [VVNetworkConfig sharedConfig].baseUrl;
+                     baseUrl = [KTNetworkConfig sharedConfig].baseUrl;
                 }
             }
         }
@@ -561,7 +560,7 @@
     return urlStr;
 }
 
-- (void)addBatchRequest:(__kindof VVBatchRequest *)request
+- (void)addBatchRequest:(__kindof KTBatchRequest *)request
 {
     if (!request) {
 #if DEBUG
@@ -569,9 +568,9 @@
 #endif
         return;
     }
-    if (![request isKindOfClass:[VVBatchRequest class]]) {
+    if (![request isKindOfClass:[KTBatchRequest class]]) {
 #if DEBUG
-        NSAssert(NO, @"please makesure [request isKindOfClass:[VVBatchRequest class]] be YES");
+        NSAssert(NO, @"please makesure [request isKindOfClass:[KTBatchRequest class]] be YES");
 #endif
         return;
     }
@@ -591,7 +590,7 @@
     }
 }
 
-- (void)removeBatchRequest:(__kindof VVBatchRequest *)request
+- (void)removeBatchRequest:(__kindof KTBatchRequest *)request
 {
     if (!request) {
 #if DEBUG
@@ -599,22 +598,22 @@
 #endif
         return;
     }
-    if (![request isKindOfClass:[VVBatchRequest class]]) {
+    if (![request isKindOfClass:[KTBatchRequest class]]) {
 #if DEBUG
-        NSAssert(NO, @"please makesure [request isKindOfClass:[VVBatchRequest class]] be YES");
+        NSAssert(NO, @"please makesure [request isKindOfClass:[KTBatchRequest class]] be YES");
 #endif
         return;
     }
     [self.lock lock];
     [self.batchRequests removeObject:request];
     [self.lock unlock];
-    for (__kindof VVBaseRequest *baseRequest in [request.requestArray copy]) {
+    for (__kindof KTBaseRequest *baseRequest in [request.requestArray copy]) {
         [baseRequest stop];
     }
     [self judgeToStartBufferRequestsWithRequest:request];
 }
 
-- (void)addChainRequest:(__kindof VVChainRequest *)request
+- (void)addChainRequest:(__kindof KTChainRequest *)request
 {
     if (!request) {
 #if DEBUG
@@ -622,9 +621,9 @@
 #endif
         return;
     }
-    if (![request isKindOfClass:[VVChainRequest class]]) {
+    if (![request isKindOfClass:[KTChainRequest class]]) {
 #if DEBUG
-        NSAssert(NO, @"please makesure [request isKindOfClass:[VVChainRequest class]] be YES");
+        NSAssert(NO, @"please makesure [request isKindOfClass:[KTChainRequest class]] be YES");
 #endif
         return;
     }
@@ -644,7 +643,7 @@
     }
 }
 
-- (void)removeChainRequest:(__kindof VVChainRequest *)request
+- (void)removeChainRequest:(__kindof KTChainRequest *)request
 {
     if (!request) {
 #if DEBUG
@@ -652,16 +651,16 @@
 #endif
         return;
     }
-    if (![request isKindOfClass:[VVChainRequest class]]) {
+    if (![request isKindOfClass:[KTChainRequest class]]) {
 #if DEBUG
-        NSAssert(NO, @"please makesure [request isKindOfClass:[VVChainRequest class]] be YES");
+        NSAssert(NO, @"please makesure [request isKindOfClass:[KTChainRequest class]] be YES");
 #endif
         return;
     }
     [self.lock lock];
     [self.chainRequests removeObject:request];
     [self.lock unlock];
-    for (__kindof VVBaseRequest *baseRequest in [request.requestArray copy]) {
+    for (__kindof KTBaseRequest *baseRequest in [request.requestArray copy]) {
         [baseRequest stop];
     }
     [self judgeToStartBufferRequestsWithRequest:request];
@@ -675,9 +674,9 @@
 #endif
         return;
     }
-    if (!([request isKindOfClass:[VVBaseRequest class]]
-          || [request isKindOfClass:[VVBatchRequest class]]
-          || [request isKindOfClass:[VVChainRequest class]])) {
+    if (!([request isKindOfClass:[KTBaseRequest class]]
+          || [request isKindOfClass:[KTBatchRequest class]]
+          || [request isKindOfClass:[KTChainRequest class]])) {
 #if DEBUG
         NSAssert(NO, @"no support this request as a PriorityFirstRequest");
 #endif
@@ -693,31 +692,31 @@
     self.priorityFirstRequest = request;
 }
 
-- (NSArray <__kindof VVBaseRequest *>*)allRequests
+- (NSArray <__kindof KTBaseRequest *>*)allRequests
 {
     [self.lock lock];
     NSMutableSet *requestSet = [NSMutableSet new];
     NSArray *array1 = [self.allStartedRequests copy];
     [requestSet addObjectsFromArray:array1];
-    for (__kindof VVBatchRequest *request in self.batchRequests) {
+    for (__kindof KTBatchRequest *request in self.batchRequests) {
         NSArray *tmpArray = request.requestArray;
         [requestSet addObjectsFromArray:tmpArray];
     }
 
-    for (__kindof VVChainRequest *request in self.chainRequests) {
+    for (__kindof KTChainRequest *request in self.chainRequests) {
         NSArray *tmpArray = request.requestArray;
         [requestSet addObjectsFromArray:tmpArray];
     }
     if (self.priorityFirstRequest) {
-        if ([self.priorityFirstRequest isKindOfClass:[VVBatchRequest class]]) {
-            VVBatchRequest *request = (VVBatchRequest *)self.priorityFirstRequest;
+        if ([self.priorityFirstRequest isKindOfClass:[KTBatchRequest class]]) {
+            KTBatchRequest *request = (KTBatchRequest *)self.priorityFirstRequest;
             NSArray *tmpArray = request.requestArray;
             [requestSet addObjectsFromArray:tmpArray];
-        } else if([self.priorityFirstRequest isKindOfClass:[VVChainRequest class]]) {
-            VVChainRequest *request = self.priorityFirstRequest;
+        } else if([self.priorityFirstRequest isKindOfClass:[KTChainRequest class]]) {
+            KTChainRequest *request = self.priorityFirstRequest;
             NSArray *tmpArray = request.requestArray;
             [requestSet addObjectsFromArray:tmpArray];
-        } else if ([self.priorityFirstRequest isKindOfClass:[VVBaseRequest class]]) {
+        } else if ([self.priorityFirstRequest isKindOfClass:[KTBaseRequest class]]) {
             [requestSet addObject:self.priorityFirstRequest];
         }
     }
@@ -738,11 +737,11 @@
     if (self.priorityFirstRequest && [self.priorityFirstRequest isEqual:request]) {
         self.priorityFirstRequest = nil;
         for (id tmpRequest in self.bufferRequests) {
-            if ([tmpRequest isKindOfClass:[VVBaseRequest class]]) {
+            if ([tmpRequest isKindOfClass:[KTBaseRequest class]]) {
                 [self addRequest:tmpRequest];
-            } else if ([tmpRequest isKindOfClass:[VVBatchRequest class]]) {
+            } else if ([tmpRequest isKindOfClass:[KTBatchRequest class]]) {
                 [self addBatchRequest:tmpRequest];
-            } else if ([tmpRequest isKindOfClass:[VVChainRequest class]]) {
+            } else if ([tmpRequest isKindOfClass:[KTChainRequest class]]) {
                 [self addChainRequest:tmpRequest];
             }
         }
@@ -750,20 +749,20 @@
     }
 }
 
-- (AFHTTPRequestSerializer *)requestSerializerForRequest:(__kindof VVBaseRequest *)request
+- (AFHTTPRequestSerializer *)requestSerializerForRequest:(__kindof KTBaseRequest *)request
 {
     AFHTTPRequestSerializer *requestSerializer = nil;
-    if (request.requestSerializerType == VVRequestSerializerTypeHTTP) {
+    if (request.requestSerializerType == KTRequestSerializerTypeHTTP) {
         requestSerializer = [AFHTTPRequestSerializer serializer];
-    } else if (request.requestSerializerType == VVRequestSerializerTypeJSON) {
+    } else if (request.requestSerializerType == KTRequestSerializerTypeJSON) {
         requestSerializer = [AFJSONRequestSerializer serializer];
     }
-    if ([VVNetworkConfig sharedConfig].HTTPMethodsEncodingParametersInURI) {
-        requestSerializer.HTTPMethodsEncodingParametersInURI = [VVNetworkConfig sharedConfig].HTTPMethodsEncodingParametersInURI;
+    if ([KTNetworkConfig sharedConfig].HTTPMethodsEncodingParametersInURI) {
+        requestSerializer.HTTPMethodsEncodingParametersInURI = [KTNetworkConfig sharedConfig].HTTPMethodsEncodingParametersInURI;
     }
 	
-	if ([VVNetworkConfig sharedConfig].isMock) {
-		requestSerializer.timeoutInterval = [VVNetworkConfig sharedConfig].mockModelTimeoutInterval;
+	if ([KTNetworkConfig sharedConfig].isMock) {
+		requestSerializer.timeoutInterval = [KTNetworkConfig sharedConfig].mockModelTimeoutInterval;
 	} else {
 		requestSerializer.timeoutInterval = [request requestTimeoutInterval];
 	}
@@ -842,7 +841,7 @@
     }
 }
 
-- (void)printRequestDescription:(__kindof VVBaseRequest *)request
+- (void)printRequestDescription:(__kindof KTBaseRequest *)request
 {
     NSLog(@"request description:%@\n",request.description);
     NSLog(@"request curl:%@\n",request.curlRequest);

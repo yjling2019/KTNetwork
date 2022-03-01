@@ -1,14 +1,13 @@
 //
-//  VVNetworkResponse.m
-//  VVCommonKit
+//  KTNetworkResponse.m
+//  KTCommonKit
 //
-//  Created by 陈栋 on 2019/11/28.
-//  Copyright © 2019 com.lebby.www. All rights reserved.
+//  Created by KOTU on 2019/11/28.
 //
 
-#import "VVNetworkResponse.h"
+#import "KTNetworkResponse.h"
 
-@interface VVNetworkResponse()
+@interface KTNetworkResponse()
 
 @property (nonatomic, assign, readwrite) NSInteger code;
 
@@ -18,11 +17,11 @@
 
 @end
 
-@implementation VVNetworkResponse
+@implementation KTNetworkResponse
 
-+ (VVNetworkResponse *)responseWithCode:(NSInteger)code dataDic:(nullable NSDictionary *)dic msg:(NSString *)msg
++ (KTNetworkResponse *)responseWithCode:(NSInteger)code dataDic:(nullable NSDictionary *)dic msg:(NSString *)msg
 {
-    VVNetworkResponse *response = [[VVNetworkResponse alloc] init];
+    KTNetworkResponse *response = [[KTNetworkResponse alloc] init];
     response.code = code;
     response.data = dic;
     response.msg = msg;

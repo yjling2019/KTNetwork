@@ -1,27 +1,27 @@
 //
-//  VVBatchRequest.m
+//  KTBatchRequest.m
 //  KTNetwork
 //
-//  Created by 凌永剑 on 2022/2/25.
+//  Created by KOTU on 2022/2/25.
 //
 
-#import "VVBatchRequest.h"
-#import "VVNetworkAgent.h"
+#import "KTBatchRequest.h"
+#import "KTNetworkAgent.h"
 #import "TDScope.h"
-#import "VVBaseRequest+Private.h"
-#import "VVGroupRequest+Private.h"
-#import "VVChainRequest.h"
-#import "VVBaseRequest+Group.h"
-#import "VVBaseDownloadRequest.h"
-#import "VVBaseUploadRequest.h"
+#import "KTBaseRequest+Private.h"
+#import "KTGroupRequest+Private.h"
+#import "KTChainRequest.h"
+#import "KTBaseRequest+Group.h"
+#import "KTBaseDownloadRequest.h"
+#import "KTBaseUploadRequest.h"
 
-@interface VVBatchRequest()
+@interface KTBatchRequest()
 
-@property (nonatomic, strong, nullable) NSMutableArray <id <VVGroupChildRequestProtocol>> *requireSuccessRequests;
+@property (nonatomic, strong, nullable) NSMutableArray <id <KTGroupChildRequestProtocol>> *requireSuccessRequests;
 
 @end
 
-@implementation VVBatchRequest
+@implementation KTBatchRequest
 
 - (void)start
 {
@@ -44,54 +44,54 @@
 		}
 	}
 	
-	for (id <VVGroupChildRequestProtocol> request in self.requestArray) {
-		if ([request isKindOfClass:[VVBaseUploadRequest class]]) {
-			VVBaseUploadRequest *uploadRequest = (VVBaseUploadRequest *)request;
+	for (id <KTGroupChildRequestProtocol> request in self.requestArray) {
+		if ([request isKindOfClass:[KTBaseUploadRequest class]]) {
+			KTBaseUploadRequest *uploadRequest = (KTBaseUploadRequest *)request;
 			@weakify(self);
-			[uploadRequest uploadWithProgress:uploadRequest.progressBlock formDataBlock:uploadRequest.formDataBlock success:^(__kindof VVBaseRequest * _Nonnull request) {
+			[uploadRequest uploadWithProgress:uploadRequest.progressBlock formDataBlock:uploadRequest.formDataBlock success:^(__kindof KTBaseRequest * _Nonnull request) {
 				@strongify(self);
 				[self handleSuccessOfRequest:request];
-			} failure:^(__kindof VVBaseRequest * _Nonnull request) {
+			} failure:^(__kindof KTBaseRequest * _Nonnull request) {
 				@strongify(self);
 				[self handleFailureOfRequest:request];
 			}];
-		} else if ([request isKindOfClass:[VVBaseDownloadRequest class]]) {
-			VVBaseDownloadRequest *downloadRequest = (VVBaseDownloadRequest *)request;
+		} else if ([request isKindOfClass:[KTBaseDownloadRequest class]]) {
+			KTBaseDownloadRequest *downloadRequest = (KTBaseDownloadRequest *)request;
 			@weakify(self);
-			[downloadRequest downloadWithProgress:downloadRequest.progressBlock success:^(__kindof VVBaseRequest * _Nonnull request) {
+			[downloadRequest downloadWithProgress:downloadRequest.progressBlock success:^(__kindof KTBaseRequest * _Nonnull request) {
 				@strongify(self);
 				[self handleSuccessOfRequest:request];
-			} failure:^(__kindof VVBaseRequest * _Nonnull request) {
+			} failure:^(__kindof KTBaseRequest * _Nonnull request) {
 				@strongify(self);
 				[self handleFailureOfRequest:request];
 			}];
-		} else  if ([request isKindOfClass:[VVBaseRequest class]]) {
+		} else  if ([request isKindOfClass:[KTBaseRequest class]]) {
 			@weakify(self);
-			VVBaseRequest *baseRequest = (VVBaseRequest *)request;
-			[baseRequest startWithCompletionSuccess:^(__kindof VVBaseRequest * _Nonnull request) {
+			KTBaseRequest *baseRequest = (KTBaseRequest *)request;
+			[baseRequest startWithCompletionSuccess:^(__kindof KTBaseRequest * _Nonnull request) {
 				@strongify(self);
 				[self handleSuccessOfRequest:request];
-			} failure:^(__kindof VVBaseRequest * _Nonnull request) {
+			} failure:^(__kindof KTBaseRequest * _Nonnull request) {
 				@strongify(self);
 				[self handleFailureOfRequest:request];
 			}];
-		} else if ([request isKindOfClass:[VVBatchRequest class]]) {
-			VVBatchRequest *batchRequest = (VVBatchRequest *)request;
+		} else if ([request isKindOfClass:[KTBatchRequest class]]) {
+			KTBatchRequest *batchRequest = (KTBatchRequest *)request;
 			@weakify(self);
-			[batchRequest startWithCompletionSuccess:^(VVBatchRequest * _Nonnull batchRequest) {
+			[batchRequest startWithCompletionSuccess:^(KTBatchRequest * _Nonnull batchRequest) {
 				@strongify(self);
 				[self handleSuccessOfRequest:request];
-			} failure:^(VVBatchRequest * _Nonnull batchRequest) {
+			} failure:^(KTBatchRequest * _Nonnull batchRequest) {
 				@strongify(self);
 				[self handleFailureOfRequest:request];
 			}];
-		} else if ([request isKindOfClass:[VVChainRequest class]]) {
-			VVChainRequest *chainRequest = (VVChainRequest *)request;
+		} else if ([request isKindOfClass:[KTChainRequest class]]) {
+			KTChainRequest *chainRequest = (KTChainRequest *)request;
 			@weakify(self);
-			[chainRequest startWithCompletionSuccess:^(VVChainRequest * _Nonnull chainRequest) {
+			[chainRequest startWithCompletionSuccess:^(KTChainRequest * _Nonnull chainRequest) {
 				@strongify(self);
 				[self handleSuccessOfRequest:request];
-			} failure:^(VVChainRequest * _Nonnull chainRequest) {
+			} failure:^(KTChainRequest * _Nonnull chainRequest) {
 				@strongify(self);
 				[self handleFailureOfRequest:request];
 			}];
@@ -99,7 +99,7 @@
 	}
 }
 
-- (void)handleSuccessOfRequest:(id <VVGroupChildRequestProtocol>)request
+- (void)handleSuccessOfRequest:(id <KTGroupChildRequestProtocol>)request
 {
 	self.finishedCount++;
 	if (request.successBlock) {
@@ -111,7 +111,7 @@
 	}
 }
 
-- (void)handleFailureOfRequest:(id <VVGroupChildRequestProtocol>)request
+- (void)handleFailureOfRequest:(id <KTGroupChildRequestProtocol>)request
 {
 	if (!self.failedRequests) {
 		self.failedRequests = [NSMutableArray new];
@@ -122,7 +122,7 @@
 		if (request.failureBlock) {
 			request.failureBlock(request);
 		}
-		for (id <VVGroupChildRequestProtocol> tmpRequest in [self.requestArray copy]) {
+		for (id <KTGroupChildRequestProtocol> tmpRequest in [self.requestArray copy]) {
 			[tmpRequest stop];
 		}
 		[self finishAllRequestsWithFailureBlock];
@@ -169,7 +169,7 @@
 	[self clearCompletionBlock];
 	self.finishedCount = 0;
 	self.failedRequests = nil;
-	[[VVNetworkAgent sharedAgent] removeBatchRequest:self];
+	[[KTNetworkAgent sharedAgent] removeBatchRequest:self];
 	self.executing = NO;
 }
 
@@ -180,12 +180,12 @@
 #endif
 }
 
-- (void)configRequireSuccessRequests:(nullable NSArray <id <VVGroupChildRequestProtocol>> *)requests
+- (void)configRequireSuccessRequests:(nullable NSArray <id <KTGroupChildRequestProtocol>> *)requests
 {
-	for (id <VVGroupChildRequestProtocol> request in requests) {
-		if (![request conformsToProtocol:@protocol(VVGroupChildRequestProtocol)]) {
+	for (id <KTGroupChildRequestProtocol> request in requests) {
+		if (![request conformsToProtocol:@protocol(KTGroupChildRequestProtocol)]) {
 #if DEBUG
-			NSAssert(NO, @"please make sure request conforms protocol VVRequestInGroupProtocol");
+			NSAssert(NO, @"please make sure request conforms protocol KTRequestInGroupProtocol");
 #endif
 			return;
 		}
@@ -193,12 +193,12 @@
 	self.requireSuccessRequests = [NSMutableArray arrayWithArray:requests];
 }
 
-- (void)startWithCompletionSuccess:(nullable void (^)(VVBatchRequest *batchRequest))successBlock
-						   failure:(nullable void (^)(VVBatchRequest *batchRequest))failureBlock
+- (void)startWithCompletionSuccess:(nullable void (^)(KTBatchRequest *batchRequest))successBlock
+						   failure:(nullable void (^)(KTBatchRequest *batchRequest))failureBlock
 {
 	self.groupSuccessBlock = successBlock;
 	self.groupFailureBlock = failureBlock;
-	[[VVNetworkAgent sharedAgent] addBatchRequest:self];
+	[[KTNetworkAgent sharedAgent] addBatchRequest:self];
 }
 
 @end

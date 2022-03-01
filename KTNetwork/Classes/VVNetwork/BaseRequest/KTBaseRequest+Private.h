@@ -1,17 +1,17 @@
 //
-//  VVBaseRequest+Private.h
+//  KTBaseRequest+Private.h
 //  KTNetwork
 //
-//  Created by 凌永剑 on 2022/2/25.
+//  Created by KOTU on 2022/2/25.
 //
 
-#import "VVBaseRequest.h"
-#import "VVBaseUploadRequest.h"
-#import "VVBaseDownloadRequest.h"
+#import "KTBaseRequest.h"
+#import "KTBaseUploadRequest.h"
+#import "KTBaseDownloadRequest.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VVBaseRequest()
+@interface KTBaseRequest()
 
 @property (nonatomic, strong, nullable) NSURLSessionTask *requestTask;
 
@@ -24,14 +24,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (atomic, strong, nullable) NSError *error;
 
 /// the request success block
-@property (nonatomic, copy, nullable) void(^successBlock)(__kindof VVBaseRequest *request);
+@property (nonatomic, copy, nullable) void(^successBlock)(__kindof KTBaseRequest *request);
 /// the request failure block
-@property (nonatomic, copy, nullable) void(^failureBlock)(__kindof VVBaseRequest *request);
+@property (nonatomic, copy, nullable) void(^failureBlock)(__kindof KTBaseRequest *request);
 
 @end
 
 
-@interface VVBaseUploadRequest ()
+@interface KTBaseUploadRequest ()
 
 /// the download/upload request progress block
 @property (nonatomic, copy, nullable) void(^progressBlock)(NSProgress *progress);
@@ -41,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 
-@interface VVBaseDownloadRequest ()
+@interface KTBaseDownloadRequest ()
 
 /// the download/upload request progress block
 @property (nonatomic, copy, nullable) void(^progressBlock)(NSProgress *progress);

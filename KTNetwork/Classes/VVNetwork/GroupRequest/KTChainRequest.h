@@ -1,19 +1,19 @@
 //
-//  VVChainRequest.h
+//  KTChainRequest.h
 //  KTNetwork
 //
-//  Created by 凌永剑 on 2022/2/25.
+//  Created by KOTU on 2022/2/25.
 //
 
-#import "VVGroupRequest.h"
+#import "KTGroupRequest.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class VVChainRequest;
+@class KTChainRequest;
 
-typedef void(^KTChainRequestBlock)(VVChainRequest *chainRequest);
+typedef void(^KTChainRequestBlock)(KTChainRequest *chainRequest);
 
-@interface VVChainRequest : VVGroupRequest
+@interface KTChainRequest : KTGroupRequest
 
 - (void)startWithCompletionSuccess:(nullable KTChainRequestBlock)successBlock
 						   failure:(nullable KTChainRequestBlock)failureBlock;

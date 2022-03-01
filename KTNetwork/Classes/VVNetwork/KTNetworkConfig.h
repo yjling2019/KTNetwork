@@ -1,19 +1,18 @@
 //
-//  VVNetworkConfig.h
-//  VVRootLib
+//  KTNetworkConfig.h
+//  KOTU
 //
 //  Created by KOTU on 2019/9/10.
-//  Copyright © 2019 com.lebby.www. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
 #import <AFNetworking/AFHTTPSessionManager.h>
-#import "VVRequestHelperProtocol.h"
+#import "KTRequestHelperProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
-@class VVBaseRequest;
+@class KTBaseRequest;
 
-@interface VVNetworkConfig : NSObject
+@interface KTNetworkConfig : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -40,18 +39,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, nonnull) NSURLSessionConfiguration *sessionConfiguration;
 
-/// the folder filePath of the download file,the defalut is under doment /VVNetworking_download
+/// the folder filePath of the download file,the defalut is under doment /KTNetworking_download
 @property (nonatomic, copy, nonnull) NSString *downloadFolderPath;
 
 /// the uncompleted folder of the download requests
 @property (nonatomic, copy, readonly) NSString *incompleteCacheFolder;
 
-@property (nonatomic, strong, readonly, nullable) id<VVRequestHelperProtocol> requestHelper;
+@property (nonatomic, strong, readonly, nullable) id<KTRequestHelperProtocol> requestHelper;
 /// HTTP methods for which serialized requests will encode parameters as a query string. `GET`, `HEAD`, and `DELETE` by default.
 /// if not set,use the default config
 @property (nonatomic, strong, nullable) NSSet <NSString *> *HTTPMethodsEncodingParametersInURI;
 
-- (void)configRequestHelper:(id<VVRequestHelperProtocol>)requestHelper;
+- (void)configRequestHelper:(id<KTRequestHelperProtocol>)requestHelper;
 
 @end
 

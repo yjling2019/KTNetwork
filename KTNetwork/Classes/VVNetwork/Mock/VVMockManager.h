@@ -1,6 +1,6 @@
 //
 //  VVMockManager.h
-//  vv_rootlib_ios
+//  KOTU
 //
 //  Created by KOTU on 2019/11/15.
 //
@@ -8,12 +8,12 @@
 #import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
-@class VVBaseRequest;
+@class KTBaseRequest;
 @interface VVMockManager : NSObject
 
 + (void)initMockConfig:(NSDictionary *)config;
 
-+ (BOOL)matchRequest:(__kindof VVBaseRequest *)request
++ (BOOL)matchRequest:(__kindof KTBaseRequest *)request
                  url:(NSString *)url;
 
 /// get the configed httpMethod of the reuquest need mock

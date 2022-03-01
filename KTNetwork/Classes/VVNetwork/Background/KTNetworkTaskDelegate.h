@@ -1,36 +1,36 @@
 //
-//  VVNetworkTaskDelegate.h
-//  vv_rootlib_ios
+//  KTNetworkTaskDelegate.h
+//  KOTU
 //
 //  Created by KOTU on 2020/12/4.
 //
 
 #import <Foundation/Foundation.h>
-#import "VVBaseDownloadRequest.h"
+#import "KTBaseDownloadRequest.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VVNetworkBaseDownloadTaskDelegate : NSObject
+@interface KTNetworkBaseDownloadTaskDelegate : NSObject
 
-@property (nonatomic, weak, readonly) __kindof VVBaseDownloadRequest *request;
+@property (nonatomic, weak, readonly) __kindof KTBaseDownloadRequest *request;
 @property (nonatomic, copy) void(^downloadProgressBlock)(NSProgress *downloadProgress);
 @property (nonatomic, copy) void(^completionHandler)(NSURLResponse *response, NSError *error);
 
 + (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
 
-- (instancetype)initWithRequest:(__kindof VVBaseDownloadRequest *)request;
+- (instancetype)initWithRequest:(__kindof KTBaseDownloadRequest *)request;
 
 - (void)URLSession:(NSURLSession *)session task:(__kindof NSURLSessionTask *)task
                       didBecomeInvalidWithError:(NSError *)error;
 
 @end
 
-@interface VVNetworkDownloadTaskDelegate : VVNetworkBaseDownloadTaskDelegate < NSURLSessionDataDelegate>
+@interface KTNetworkDownloadTaskDelegate : KTNetworkBaseDownloadTaskDelegate < NSURLSessionDataDelegate>
 
 @end
 
-@interface VVNetworkBackgroundDownloadTaskDelegate : VVNetworkBaseDownloadTaskDelegate <NSURLSessionDownloadDelegate>
+@interface KTNetworkBackgroundDownloadTaskDelegate : KTNetworkBaseDownloadTaskDelegate <NSURLSessionDownloadDelegate>
 
 @end
 
