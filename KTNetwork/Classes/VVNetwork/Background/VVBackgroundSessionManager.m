@@ -2,7 +2,7 @@
 //  VVBackgroundSessionManager.m
 //  vv_rootlib_ios
 //
-//  Created by JackLee on 2020/12/12.
+//  Created by KOTU on 2020/12/12.
 //
 
 #import "VVBackgroundSessionManager.h"

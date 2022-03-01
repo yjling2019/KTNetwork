@@ -2,7 +2,7 @@
 //  VVGroupRequest.h
 //  vv_rootlib_ios
 //
-//  Created by JackLee on 2019/11/15.
+//  Created by KOTU on 2019/11/15.
 //
 
 #import <Foundation/Foundation.h>

@@ -2,7 +2,7 @@
 //  VVNetworkTaskDelegate.m
 //  vv_rootlib_ios
 //
-//  Created by JackLee on 2020/12/4.
+//  Created by KOTU on 2020/12/4.
 //
 
 #import "VVNetworkTaskDelegate.h"

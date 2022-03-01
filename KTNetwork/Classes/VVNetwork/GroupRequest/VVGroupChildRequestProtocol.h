@@ -2,7 +2,7 @@
 //  VVRequestInGroupProtocol.h
 //  vv_rootlib_ios
 //
-//  Created by JackLee on 2021/4/21.
+//  Created by KOTU on 2021/4/21.
 //
 
 #ifndef VVRequestInGroupProtocol_h
