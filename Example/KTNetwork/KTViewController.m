@@ -69,7 +69,7 @@
 - (KTBaseRequest *)getRequest
 {
 	KTBaseRequest *request = [[KTBaseRequest alloc] init];
-	request.customRequestUrl = @"http://www.phonegap100.com/appapi.php?a=getPortalList&catid=20&page=1";
+	request.baseUrl = @"http://www.phonegap100.com/appapi.php?a=getPortalList&catid=20&page=1";
 	return request;
 }
 

@@ -563,7 +563,11 @@ static dispatch_once_t onceToken;
 			url = [url URLByAppendingPathComponent:@""];
 		}
 		if (![[url path] isEqualToString:@"/"]) {
-			detailUrl = [NSString stringWithFormat:@"%@%@",[url path],detailUrl];
+			if (!detailUrl) {
+				detailUrl = [url path];
+			} else {
+				detailUrl = [NSString stringWithFormat:@"%@%@",[url path],detailUrl];
+			}
 		}
 		urlStr = [NSURL URLWithString:detailUrl relativeToURL:url].absoluteString;
 	}
