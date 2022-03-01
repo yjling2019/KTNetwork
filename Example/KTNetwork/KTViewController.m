@@ -10,6 +10,8 @@
 #import "KTBaseRequest.h"
 #import "KTNetworkAgent.h"
 #import "KTNetworkConfig.h"
+#import "KTGroupRequest.h"
+#import "KTChainRequest.h"
 
 @interface KTViewController ()
 
@@ -24,7 +26,9 @@
 	
 	[self config];
 	
-	[self testRequest];
+//	[self testRequest];
+	[self testChainRequest];
+	[self testBatchRequest];
 }
 
 - (void)config
@@ -38,16 +42,35 @@
 
 - (void)testRequest
 {
-	KTBaseRequest *request = [[KTBaseRequest alloc] init];
-//	[request addRequestHeader:@{
-//		@"Accept" : @"application/json",
-//	}];
-	request.customRequestUrl = @"http://www.phonegap100.com/appapi.php?a=getPortalList&catid=20&page=1";
+	KTBaseRequest *request = [self getRequest];
 	[request startWithCompletionSuccess:^(__kindof KTBaseRequest * _Nonnull request) {
 			
 	} failure:^(__kindof KTBaseRequest * _Nonnull request) {
 			
 	}];
+}
+
+- (void)testChainRequest
+{
+	KTChainRequest *request = [[KTChainRequest alloc] init];
+	[request addRequestsWithArray:@[[self getRequest], [self getRequest]]];
+	[request startWithCompletionSuccess:^(id<KTRequestProcessProtocol>  _Nonnull request) {
+			
+	} failure:^(id<KTRequestProcessProtocol>  _Nonnull request) {
+			
+	}];
+}
+
+- (void)testBatchRequest
+{
+	
+}
+
+- (KTBaseRequest *)getRequest
+{
+	KTBaseRequest *request = [[KTBaseRequest alloc] init];
+	request.customRequestUrl = @"http://www.phonegap100.com/appapi.php?a=getPortalList&catid=20&page=1";
+	return request;
 }
 
 @end

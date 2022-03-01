@@ -10,7 +10,6 @@
 #import "TDScope.h"
 #import "KTBaseRequest+Private.h"
 #import "KTGroupRequest+Private.h"
-#import "KTBaseRequest+Group.h"
 
 @implementation KTGroupRequest
 

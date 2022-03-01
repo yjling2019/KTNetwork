@@ -11,9 +11,18 @@
 #import "KTRequestProcessProtocol.h"
 
 @class KTGroupRequest;
+@protocol KTGroupChildRequestProtocol;
+
+@protocol KTGroupChildRequestDelegate <NSObject>
+
+- (void)childRequestDidSuccess:(id <KTGroupChildRequestProtocol> _Nonnull)request;
+- (void)childRequestDidFail:(id <KTGroupChildRequestProtocol> _Nonnull)request;
+
+@end
 
 @protocol KTGroupChildRequestProtocol <KTRequestProcessProtocol>
 
+@property (nonatomic, weak, nullable) id <KTGroupChildRequestDelegate> delegate;
 @property (nonatomic, weak, nullable) __kindof KTGroupRequest *groupRequest;
 
 /// the childRequest success block

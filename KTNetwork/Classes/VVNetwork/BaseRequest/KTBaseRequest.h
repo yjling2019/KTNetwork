@@ -7,7 +7,7 @@
 
 #import <Foundation/Foundation.h>
 #import <AFNetworking/AFHTTPSessionManager.h>
-#import "KTRequestProcessProtocol.h"
+#import "KTGroupChildRequestProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 @class KTBaseRequest,KTNetworkResponse;
@@ -65,7 +65,7 @@ static NSString * const KTNetworkErrorDomain = @"KTNetworkError";
 @end
 
 
-@interface KTBaseRequest : NSObject <KTRequestProcessProtocol>
+@interface KTBaseRequest : NSObject <KTGroupChildRequestProtocol, KTGroupChildRequestDelegate>
 
 #pragma mark - request
 /// the request apiName,fact is a path of url,it can contain path and query params
@@ -164,6 +164,11 @@ static NSString * const KTNetworkErrorDomain = @"KTNetworkError";
 @property (nonatomic, copy, nullable) NSString *cdnBaseUrl;
 
 #pragma mark - handler
+/// the request success block
+@property (nonatomic, copy, nullable, readwrite) void(^successBlock)(__kindof KTBaseRequest *request);
+/// the request failure block
+@property (nonatomic, copy, nullable, readwrite) void(^failureBlock)(__kindof KTBaseRequest *request);
+
 /// after request success before successBlock callback,do this func,if you want extra handle,return YES,else return NO
 - (BOOL)requestSuccessPreHandle;
 

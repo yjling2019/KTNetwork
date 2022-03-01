@@ -23,11 +23,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (atomic, strong, nullable) NSError *error;
 
-/// the request success block
-@property (nonatomic, copy, nullable) void(^successBlock)(__kindof KTBaseRequest *request);
-/// the request failure block
-@property (nonatomic, copy, nullable) void(^failureBlock)(__kindof KTBaseRequest *request);
-
 @end
 
 

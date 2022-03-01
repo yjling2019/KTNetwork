@@ -10,11 +10,10 @@
 #import "TDScope.h"
 #import "KTBaseRequest+Private.h"
 #import "KTGroupRequest+Private.h"
-#import "KTBaseRequest+Group.h"
 #import "KTBaseDownloadRequest.h"
 #import "KTBaseUploadRequest.h"
 
-@interface KTChainRequest()
+@interface KTChainRequest() <KTGroupChildRequestDelegate>
 
 @property (nonatomic, strong, nullable) id <KTGroupChildRequestProtocol> lastRequest;
 @property (nonatomic, assign, readonly) BOOL canStartNextRequest;
@@ -48,42 +47,15 @@
 - (void)startNextRequest
 {
 	if (self.canStartNextRequest) {
-		KTBaseRequest *request = self.requestArray[self.finishedCount];
+		id <KTGroupChildRequestProtocol> request = self.requestArray[self.finishedCount];
 		self.finishedCount++;
-		if ([request isKindOfClass:[KTBaseUploadRequest class]]) {
-			KTBaseUploadRequest *uploadRequest = (KTBaseUploadRequest *)request;
-			@weakify(self);
-			[uploadRequest uploadWithProgress:uploadRequest.progressBlock formDataBlock:uploadRequest.formDataBlock success:^(__kindof KTBaseRequest * _Nonnull request) {
-				@strongify(self);
-				[self handleSuccessOfRequest:request];
-			} failure:^(__kindof KTBaseRequest * _Nonnull request) {
-				@strongify(self);
-				[self handleFailureOfRequest:request];
-			}];
-		} else if ([request isKindOfClass:[KTBaseDownloadRequest class]]) {
-			KTBaseDownloadRequest *downloadRequest = (KTBaseDownloadRequest *)request;
-			@weakify(self);
-			[downloadRequest downloadWithProgress:downloadRequest.progressBlock success:^(__kindof KTBaseRequest * _Nonnull request) {
-				@strongify(self);
-				[self handleSuccessOfRequest:request];
-			} failure:^(__kindof KTBaseRequest * _Nonnull request) {
-				@strongify(self);
-				[self handleFailureOfRequest:request];
-			}];
-		} else if ([request isKindOfClass:[KTBaseRequest class]]) {
-			@weakify(self);
-			[request startWithCompletionSuccess:^(id <KTRequestProcessProtocol> request) {
-				@strongify(self);
-				[self handleSuccessOfRequest:(KTBaseRequest *)request];
-			} failure:^(id <KTRequestProcessProtocol> request) {
-				@strongify(self);
-				[self handleFailureOfRequest:(KTBaseRequest *)request];
-			}];
-		}
+		request.delegate = self;
+		[request start];
 	}
 }
 
-- (void)handleSuccessOfRequest:(__kindof KTBaseRequest *)request
+#pragma mark - KTGroupChildRequestDelegate
+- (void)childRequestDidSuccess:(id <KTGroupChildRequestProtocol> _Nonnull)request
 {
 	self.lastRequest = request;
 	if (request.successBlock) {
@@ -99,7 +71,7 @@
 	}
 }
 
-- (void)handleFailureOfRequest:(__kindof KTBaseRequest *)request
+- (void)childRequestDidFail:(id <KTGroupChildRequestProtocol> _Nonnull)request
 {
 	if (!self.failedRequests) {
 		self.failedRequests = [NSMutableArray new];

@@ -18,7 +18,7 @@
 #import "KTBaseRequest+Private.h"
 #import "KTBaseRequest.h"
 #import "KTBaseUploadRequest.h"
-#import "KTBaseRequest+Group.h"
+#import "KTRequestProcessProtocol.h"
 #import "KTBatchRequest.h"
 #import "KTChainRequest.h"
 #import "KTGroupChildRequestProtocol.h"

@@ -494,11 +494,8 @@ static dispatch_once_t onceToken;
 
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[request willFinished];
-		if (request.successBlock) {
-			request.successBlock(request);
-		}
+		[request childRequestDidSuccess:request];
 		[request didFinished];
-		
 		[self judgeToStartBufferRequestsWithRequest:request];
 	});
 }
@@ -517,24 +514,9 @@ static dispatch_once_t onceToken;
 	}
 	
 	dispatch_async(dispatch_get_main_queue(), ^{
-		if (request.isIndependentRequest) {
-			if (request.requestAccessory &&
-				[request.requestAccessory respondsToSelector:@selector(requestWillStop:)]) {
-				[request.requestAccessory requestWillStop:request];
-			}
-		}
-		
-		if (request.failureBlock) {
-			request.failureBlock(request);
-		}
-		
-		if (request.isIndependentRequest) {
-			if (request.requestAccessory &&
-				[request.requestAccessory respondsToSelector:@selector(requestDidStop:)]) {
-				[request.requestAccessory requestDidStop:request];
-			}
-		}
-		
+		[request willFinished];
+		[request childRequestDidFail:request];
+		[request didFinished];
 		[self judgeToStartBufferRequestsWithRequest:request];
 	});
 }
