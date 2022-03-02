@@ -204,6 +204,22 @@
     }
 }
 
+
+#pragma mark - KTRequestInGroupProtocol
+- (BOOL)isIndependentRequest
+{
+	return self.groupRequest ? NO : YES;
+}
+
+- (void)inAdvanceCompleteGroupRequestWithResult:(BOOL)isSuccess
+{
+#warning TODO 0301
+//	if (!self.groupRequest) {
+//		return;
+//	}
+//	[self.groupRequest inAdvanceCompleteWithResult:isSuccess];
+}
+
 #pragma mark - KTGroupChildRequestDelegate
 - (void)childRequestDidSuccess:(id <KTGroupChildRequestProtocol>)request
 {
@@ -346,26 +362,6 @@
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@: %p>{ URL: %@ } { method: %@ } { arguments: %@ }", NSStringFromClass([self class]), self, self.requestTask.currentRequest.URL, self.requestTask.currentRequest.HTTPMethod, self.requestArgument];
-}
-
-@end
-
-
-@implementation KTBaseRequest(Group)
-
-#pragma mark - - KTRequestInGroupProtocol - -
-- (BOOL)isIndependentRequest
-{
-	return self.groupRequest ? NO : YES;
-}
-
-- (void)inAdvanceCompleteGroupRequestWithResult:(BOOL)isSuccess
-{
-#warning TODO 0301
-//	if (!self.groupRequest) {
-//		return;
-//	}
-//	[self.groupRequest inAdvanceCompleteWithResult:isSuccess];
 }
 
 @end

@@ -60,9 +60,9 @@
 	self.lastRequest = request;
 	if (request.successBlock) {
 		request.successBlock(request);
-		if (self.inAdvanceCompleted) {
-			return;
-		}
+	}
+	if (self.inAdvanceCompleted) {
+		return;
 	}
 	if (self.canStartNextRequest) {
 		[self startNextRequest];
@@ -80,9 +80,9 @@
 	self.lastRequest = request;
 	if (request.failureBlock) {
 		request.failureBlock(request);
-		if (self.inAdvanceCompleted) {
-			return;
-		}
+	}
+	if (self.inAdvanceCompleted) {
+		return;
 	}
 	for (id <KTGroupChildRequestProtocol> tmpRequest in [self.requestArray copy]) {
 		[tmpRequest stop];

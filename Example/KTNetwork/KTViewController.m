@@ -12,6 +12,7 @@
 #import "KTNetworkConfig.h"
 #import "KTGroupRequest.h"
 #import "KTChainRequest.h"
+#import "KTBatchRequest.h"
 
 @interface KTViewController ()
 
@@ -27,7 +28,7 @@
 	[self config];
 	
 //	[self testRequest];
-	[self testChainRequest];
+//	[self testChainRequest];
 	[self testBatchRequest];
 }
 
@@ -53,7 +54,7 @@
 - (void)testChainRequest
 {
 	KTChainRequest *request = [[KTChainRequest alloc] init];
-	[request addRequestsWithArray:@[[self getRequest], [self getRequest]]];
+	[request addRequestsWithArray:@[[self getRequest], [self getChainRequest]]];
 	[request startWithCompletionSuccess:^(id<KTRequestProcessProtocol>  _Nonnull request) {
 			
 	} failure:^(id<KTRequestProcessProtocol>  _Nonnull request) {
@@ -63,13 +64,34 @@
 
 - (void)testBatchRequest
 {
-	
+	KTBatchRequest *request = [[KTBatchRequest alloc] init];
+	[request addRequestsWithArray:@[[self getRequest], [self getChainRequest]]];
+	[request startWithCompletionSuccess:^(id<KTRequestProcessProtocol>  _Nonnull request) {
+			
+	} failure:^(id<KTRequestProcessProtocol>  _Nonnull request) {
+			
+	}];
 }
 
 - (KTBaseRequest *)getRequest
 {
 	KTBaseRequest *request = [[KTBaseRequest alloc] init];
-	request.baseUrl = @"http://www.phonegap100.com/appapi.php?a=getPortalList&catid=20&page=1";
+	request.customRequestUrl = @"http://www.phonegap100.com/appapi.php?a=getPortalList&catid=20&page=1";
+	request.requestMethod = KTRequestMethodGET;
+	return request;
+}
+
+- (KTChainRequest *)getChainRequest
+{
+	KTChainRequest *request = [[KTChainRequest alloc] init];
+	[request addRequestsWithArray:@[[self getRequest], [self getRequest]]];
+	return request;
+}
+
+- (KTBatchRequest *)getBatchRequest
+{
+	KTBatchRequest *request = [[KTBatchRequest alloc] init];
+	[request addRequestsWithArray:@[[self getRequest], [self getRequest]]];
 	return request;
 }
 

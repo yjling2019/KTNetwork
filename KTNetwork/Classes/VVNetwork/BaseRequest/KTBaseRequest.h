@@ -105,6 +105,7 @@ static NSString * const KTNetworkErrorDomain = @"KTNetworkError";
 
 #pragma mark - context
 @property (nonatomic, assign, readonly) BOOL isIndependentRequest;
+
 /// the requestTask of the Request
 @property (nonatomic, strong, readonly, nullable) NSURLSessionTask *requestTask;
 

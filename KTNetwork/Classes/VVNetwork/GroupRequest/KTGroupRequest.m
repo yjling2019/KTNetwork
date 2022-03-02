@@ -14,7 +14,7 @@
 @implementation KTGroupRequest
 
 @synthesize groupRequest = _groupRequest;
-
+@synthesize delegate = _delegate;
 @synthesize successBlock = _successBlock;
 @synthesize failureBlock = _failureBlock;
 
@@ -73,8 +73,15 @@
 - (void)finishAllRequestsWithSuccessBlock
 {
 	[self willFinished];
-	if (self.successBlock) {
-		self.successBlock(self);
+	
+	if (self.isIndependentRequest) {
+		if (self.successBlock) {
+			self.successBlock(self);
+		}
+	} else {
+		if (self.delegate) {
+			[self.delegate childRequestDidSuccess:self];
+		}
 	}
 	
 	[self stop];
@@ -85,8 +92,15 @@
 - (void)finishAllRequestsWithFailureBlock
 {
 	[self willFinished];
-	if (self.failureBlock) {
-		self.failureBlock(self);
+	
+	if (self.isIndependentRequest) {
+		if (self.failureBlock) {
+			self.failureBlock(self);
+		}
+	} else {
+		if (self.delegate) {
+			[self.delegate childRequestDidFail:self];
+		}
 	}
 	
 	[self stop];
