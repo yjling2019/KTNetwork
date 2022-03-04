@@ -8,7 +8,6 @@
 #import <Foundation/Foundation.h>
 #import <AFNetworking/AFHTTPSessionManager.h>
 #import "KTGroupChildRequestProtocol.h"
-#import "KTNetworkResponse.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
