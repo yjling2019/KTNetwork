@@ -176,9 +176,6 @@ static NSString * const KTNetworkErrorDomain = @"KTNetworkError";
 ///after request failure before successBlock callback,do this func,if you want extra handle,return YES,else return NO
 - (BOOL)requestFailurePreHandle;
 
-#pragma mark - utils
-+ (NSString *)makeCURLWithRequest:(NSURLRequest *)request;
-
 #pragma mark - operation
 - (void)startWithCompletionSuccess:(nullable void(^)(__kindof KTBaseRequest *request))successBlock
 						   failure:(nullable void(^)(__kindof KTBaseRequest *request))failureBlock;

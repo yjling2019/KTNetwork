@@ -9,6 +9,7 @@
 #import "KTNetworkAgent.h"
 #import "KTNetworkConfig.h"
 #import "KTBaseRequest+Private.h"
+#import "KTNetworkAgent.h"
 
 @implementation KTBaseRequest
 
@@ -276,87 +277,8 @@
 - (NSString *)curlRequest
 {
     NSURLRequest *request = self.requestTask.currentRequest;
-    return [KTBaseRequest makeCURLWithRequest:request];
-}
-
-+ (NSString *)makeCURLWithRequest:(NSURLRequest *)request {
-#warning TODO 0225
-	return nil;
-	
-//    NSURLSession *session = KTRequestManager.manager.sharedSession;
-//    NSMutableArray *components = @[@"curl "].mutableCopy;
-//
-//    NSURL *URL = request.URL;
-//    NSString *host = URL.host;
-//    if (!URL || !host) {
-//        return @"curl command could not be created";
-//    }
-//
-//    NSString *HTTPMethod = request.HTTPMethod;
-//    if (![HTTPMethod isEqualToString:@"GET"] && !vv_isEmptyStr(HTTPMethod)) {
-//        [components addObject:[NSString stringWithFormat:@"-X %@",HTTPMethod]];
-//    }
-//
-//    NSURLCredentialStorage *credentialStorage = session.configuration.URLCredentialStorage;
-//
-//    NSURLProtectionSpace *protectionSpace = [NSURLProtectionSpace.alloc initWithHost:host port:URL.port.integerValue protocol:URL.scheme realm:host authenticationMethod:NSURLAuthenticationMethodHTTPBasic];
-//
-//    NSArray <NSURLCredential *>*credentials = [credentialStorage credentialsForProtectionSpace:protectionSpace].allValues;
-//    for (NSURLCredential *credential in credentials) {
-//        if (!vv_isEmptyStr(credential.user) && !vv_isEmptyStr(credential.password)) {
-//            NSString *str = [NSString stringWithFormat:@"-u %@:%@",credential.user, credential.password];
-//            [components addObject:str];
-//        }
-//    }
-//
-//    if (session.configuration.HTTPShouldSetCookies) {
-//        NSHTTPCookieStorage *cookieStorage = session.configuration.HTTPCookieStorage;
-//        NSArray<NSHTTPCookie *> *cookies = [cookieStorage cookiesForURL:URL];
-//        if (cookies.count > 0) {
-//            NSMutableString *cookieString = NSMutableString.string;
-//            for (NSHTTPCookie *cookie in cookies) {
-//                [cookieString appendFormat:@"%@=%@;",cookie.name,cookie.value];
-//            }
-//            if (!vv_isEmptyStr(cookieString)) {
-//                NSString *str = [NSString stringWithFormat:@"-b \"%@\"",cookieString];
-//                [components addObject:str];
-//            }
-//        }
-//    }
-//
-//    NSMutableDictionary *headers = NSMutableDictionary.dictionary;
-//    NSDictionary *additionalHeaders = session.configuration.HTTPAdditionalHeaders;
-//    NSDictionary *headerFields = request.allHTTPHeaderFields;
-//    [headers addEntriesFromDictionary:additionalHeaders];
-//    [headers addEntriesFromDictionary:headerFields];
-//    [headers removeObjectForKey:@"Cookie"];
-//
-//    for (id key in headers.allKeys) {
-//        if (!vv_isEmptyStr(key) && !vv_isEmptyStr(headers[key])) {
-//            NSString *str = [NSString stringWithFormat:@"-H \"%@:%@\"",key, headers[key]];
-//            [components addObject:str];
-//        }
-//    }
-//
-//    NSData *HTTPBodyData = request.HTTPBody;
-//    NSString *HTTPBody = [[NSString alloc] initWithData:HTTPBodyData encoding:NSUTF8StringEncoding];
-//    if (HTTPBody) {
-//        NSString *escapedBody = [HTTPBody stringByReplacingOccurrencesOfString:@"\\\"" withString:@"\\\\\""];
-//        escapedBody = [escapedBody stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
-//        NSString *str = [NSString stringWithFormat:@"-d \"%@\"",escapedBody];
-//        if (!vv_isEmptyStr(escapedBody)) {
-//            [components addObject:str];
-//        }
-//    }
-//
-//    if (!vv_isEmptyStr(URL.absoluteString)) {
-//        NSString *str = [NSString stringWithFormat:@"--compressed \"%@\"",URL.absoluteString];
-//        [components addObject:str];
-//    }
-//
-//    NSString *command = [components componentsJoinedByString:@" \\\n\t"];
-//
-//    return command;
+	NSString *curl = [KTNetworkAgent curlOfRequest:request];
+	return curl;
 }
 
 - (NSString *)description
