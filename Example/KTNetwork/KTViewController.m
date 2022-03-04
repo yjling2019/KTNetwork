@@ -77,7 +77,7 @@
 {
 	KTBaseRequest *request = [[KTBaseRequest alloc] init];
 	request.customRequestUrl = @"http://www.phonegap100.com/appapi.php?a=getPortalList&catid=20&page=1";
-	request.requestMethod = KTRequestMethodGET;
+	request.method = KTRequestMethodGET;
 	return request;
 }
 

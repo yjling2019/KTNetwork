@@ -639,7 +639,7 @@ static dispatch_once_t onceToken;
 	if ([KTNetworkConfig sharedConfig].isMock) {
 		requestSerializer.timeoutInterval = [KTNetworkConfig sharedConfig].mockModelTimeoutInterval;
 	} else {
-		requestSerializer.timeoutInterval = [request requestTimeoutInterval];
+		requestSerializer.timeoutInterval = [request timeoutInterval];
 	}
            // If api needs to add custom value to HTTPHeaderField
     NSDictionary<NSString *, NSString *> *headerFieldValueDictionary = [request requestHeaders];
@@ -696,7 +696,7 @@ static dispatch_once_t onceToken;
 		}
 	} else {
 		url = [self buildRequestUrl:request];
-		param = request.requestArgument;
+		param = request.params;
 	}
 	
 	if ([KTNetworkConfig sharedConfig].isMock) {
@@ -760,7 +760,7 @@ static dispatch_once_t onceToken;
 										error:(NSError * _Nullable __autoreleasing *)error
 {
 	NSString *method = nil;
-	switch (request.requestMethod) {
+	switch (request.method) {
 		case KTRequestMethodGET:
 		{
 			method = @"GET";

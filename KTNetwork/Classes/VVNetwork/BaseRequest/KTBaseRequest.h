@@ -8,9 +8,9 @@
 #import <Foundation/Foundation.h>
 #import <AFNetworking/AFHTTPSessionManager.h>
 #import "KTGroupChildRequestProtocol.h"
+#import "KTNetworkResponse.h"
 
 NS_ASSUME_NONNULL_BEGIN
-@class KTBaseRequest,KTNetworkResponse;
 
 typedef NS_ENUM(NSInteger,KTRequestMethod)
 {
@@ -77,16 +77,16 @@ static NSString * const KTNetworkErrorDomain = @"KTNetworkError";
 /// the customUrl of the request,it contain domain,path,query, and so on.
 @property (nonatomic, copy, nullable) NSString *customRequestUrl;
 /// the method of the request,default is GET
-@property (nonatomic, assign) KTRequestMethod requestMethod;
+@property (nonatomic, assign) KTRequestMethod method;
 /// the params of the request
-@property (nonatomic, copy, nullable) NSDictionary *requestArgument;
+@property (nonatomic, copy, nullable) NSDictionary *params;
 
 /// the custom func of filter url,default is nil
 - (NSString *)buildCustomRequestUrl;
 
 #pragma mark - config
 /// the request timeout interval
-@property (nonatomic, assign) NSTimeInterval requestTimeoutInterval;
+@property (nonatomic, assign) NSTimeInterval timeoutInterval;
 /// the request serializer type
 @property (nonatomic, assign) KTRequestSerializerType requestSerializerType;
 /// the response serializer type

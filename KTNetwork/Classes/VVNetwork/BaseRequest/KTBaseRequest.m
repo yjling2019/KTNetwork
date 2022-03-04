@@ -19,7 +19,7 @@
 {
     self = [super init];
     if (self) {
-        _requestTimeoutInterval = 15;
+        _timeoutInterval = 15;
 		_requestSerializerType = KTRequestSerializerTypeHTTP;
 		_responseSerializerType = KTResponseSerializerTypeJSON;
 		_ignoreCache = YES;
@@ -361,7 +361,7 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@: %p>{ URL: %@ } { method: %@ } { arguments: %@ }", NSStringFromClass([self class]), self, self.requestTask.currentRequest.URL, self.requestTask.currentRequest.HTTPMethod, self.requestArgument];
+    return [NSString stringWithFormat:@"<%@: %p>{ URL: %@ } { method: %@ } { arguments: %@ }", NSStringFromClass([self class]), self, self.requestTask.currentRequest.URL, self.requestTask.currentRequest.HTTPMethod, self.params];
 }
 
 @end
