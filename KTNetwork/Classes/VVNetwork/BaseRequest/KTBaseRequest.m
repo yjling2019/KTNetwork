@@ -276,7 +276,7 @@
 
 - (NSString *)curlRequest
 {
-    NSURLRequest *request = self.requestTask.currentRequest;
+    NSURLRequest *request = self.requestTask.originalRequest;
 	NSString *curl = [KTNetworkAgent curlOfRequest:request];
 	return curl;
 }
