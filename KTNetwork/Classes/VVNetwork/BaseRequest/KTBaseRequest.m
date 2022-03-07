@@ -141,6 +141,16 @@
 	self.requestHeaders = [dic copy];
 }
 
+- (void)addRequestHeader:(NSString *)value forKey:(NSString *)key
+{
+	if (!value) {
+		return;
+	}
+	NSMutableDictionary *dic = [NSMutableDictionary dictionaryWithDictionary:self.requestHeaders];
+	[dic setValue:value forKey:key];
+	self.requestHeaders = [dic copy];
+}
+
 - (void)addJsonValidator:(NSDictionary *)validator
 {
     if (!self.jsonValidator) {

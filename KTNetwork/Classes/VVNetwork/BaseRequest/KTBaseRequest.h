@@ -97,6 +97,7 @@ static NSString * const KTNetworkErrorDomain = @"KTNetworkError";
 @property (nonatomic,strong, nullable) Class<KTRequestAccessoryProtocol> requestAccessory;
 
 - (void)addRequestHeader:(NSDictionary <NSString *,NSString *>*)header;
+- (void)addRequestHeader:(NSString *)value forKey:(NSString *)key;
 
 #pragma mark - identifier
 @property (nonatomic, copy) NSString *module;
