@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 /// the status of the KTGroupRequest is executing or not
-@property (nonatomic, assign) BOOL executing;
+@property (nonatomic, assign, getter=isExecuting) BOOL executing;
 /// the count of finished requests
 @property (nonatomic, assign) NSInteger finishedCount;
 /// the status of the groupRequest is complete inadvance

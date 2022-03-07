@@ -170,6 +170,9 @@ static NSString * const KTNetworkErrorDomain = @"KTNetworkError";
 /// the request failure block
 @property (nonatomic, copy, nullable, readwrite) void(^failureBlock)(__kindof KTBaseRequest *request);
 
+- (void)configCompletionSuccess:(nullable void(^)(__kindof KTBaseRequest *request))successBlock
+						failure:(nullable void(^)(__kindof KTBaseRequest *request))failureBlock;
+
 /// after request success before successBlock callback,do this func,if you want extra handle,return YES,else return NO
 - (BOOL)requestSuccessPreHandle;
 

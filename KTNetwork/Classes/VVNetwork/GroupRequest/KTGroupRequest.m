@@ -69,6 +69,20 @@
     }
 }
 
+- (void)configCompletionSuccess:(nullable void(^)(__kindof KTGroupRequest *request))successBlock
+						failure:(nullable void(^)(__kindof KTGroupRequest *request))failureBlock
+{
+	if (self.isExecuting) {
+#if DEBUG
+		NSAssert(NO, @"cannot update completion block when executing");
+#endif
+		return;
+	}
+	
+	self.successBlock = successBlock;
+	self.failureBlock = failureBlock;
+}
+
 #pragma mark - private
 - (void)finishAllRequestsWithSuccessBlock
 {
@@ -115,7 +129,7 @@
 		return;
 	}
 	
-	if (self.executing) {
+	if (self.isExecuting) {
 		return;
 	}
 	

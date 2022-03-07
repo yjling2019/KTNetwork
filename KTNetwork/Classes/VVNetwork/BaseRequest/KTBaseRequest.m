@@ -108,6 +108,20 @@
 	}
 }
 
+- (void)configCompletionSuccess:(nullable void(^)(__kindof KTBaseRequest *request))successBlock
+						failure:(nullable void(^)(__kindof KTBaseRequest *request))failureBlock
+{
+	if (self.isExecuting) {
+#if DEBUG
+		NSAssert(NO, @"cannot update completion block when executing");
+#endif
+		return;
+	}
+	
+	self.successBlock = successBlock;
+	self.failureBlock = failureBlock;
+}
+
 - (BOOL)requestSuccessPreHandle
 {
 #warning TODO cache 0225

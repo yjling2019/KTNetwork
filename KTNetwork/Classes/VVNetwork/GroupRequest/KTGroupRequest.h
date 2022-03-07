@@ -37,6 +37,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// complete the groupRequest(batchRequest or chainRequest) in advance,even if the groupRequest has requests not complete.
 - (void)inAdvanceCompleteGroupRequestWithResult:(BOOL)isSuccess;
 
+- (void)configCompletionSuccess:(nullable void(^)(__kindof KTGroupRequest *request))successBlock
+						failure:(nullable void(^)(__kindof KTGroupRequest *request))failureBlock;
 @end
 
 NS_ASSUME_NONNULL_END
