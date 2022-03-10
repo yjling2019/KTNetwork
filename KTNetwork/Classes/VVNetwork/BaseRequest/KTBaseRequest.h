@@ -164,6 +164,9 @@ static NSString * const KTNetworkErrorDomain = @"KTNetworkError";
 /// the request baseurl of cdn it can contain host,port,and some path
 @property (nonatomic, copy, nullable) NSString *cdnBaseUrl;
 
+#pragma mark - log
+@property (nonatomic, assign) BOOL showRequestLog;
+
 #pragma mark - handler
 /// the request success block
 @property (nonatomic, copy, nullable, readwrite) void(^successBlock)(__kindof KTBaseRequest *request);

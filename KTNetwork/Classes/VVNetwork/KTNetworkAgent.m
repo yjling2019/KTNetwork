@@ -445,7 +445,9 @@ static dispatch_once_t onceToken;
 	}
 	
 #if DEBUG
-	[self printRequestDescription:request];
+	if (request.showRequestLog) {
+		[self printRequestDescription:request];
+	}
 #endif
 	
 	dispatch_async(dispatch_get_main_queue(), ^{
