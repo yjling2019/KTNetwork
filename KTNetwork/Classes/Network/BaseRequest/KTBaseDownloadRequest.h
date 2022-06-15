@@ -20,6 +20,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// the background policy of the downloadRequest
 @property (nonatomic, assign) KTDownloadBackgroundPolicy backgroundPolicy;
 
+/// the download/upload request progress block
+@property (nonatomic, copy, nullable) void(^progressBlock)(NSProgress *progress);
+
 + (instancetype)new NS_UNAVAILABLE;
 
 + (instancetype)init NS_UNAVAILABLE;

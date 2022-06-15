@@ -25,22 +25,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-
-@interface KTBaseUploadRequest ()
-
-/// the download/upload request progress block
-@property (nonatomic, copy, nullable) void(^progressBlock)(NSProgress *progress);
-/// when upload data cofig the formData
-@property (nonatomic, copy, nullable) void (^formDataBlock)(id<AFMultipartFormData> formData);
-
-@end
-
-
-@interface KTBaseDownloadRequest ()
-
-/// the download/upload request progress block
-@property (nonatomic, copy, nullable) void(^progressBlock)(NSProgress *progress);
-
-@end
-
 NS_ASSUME_NONNULL_END
