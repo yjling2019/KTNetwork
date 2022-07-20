@@ -16,7 +16,6 @@
 #import "KTNetworkConfig.h"
 #import "VVMockManager.h"
 #import "KTBackgroundSessionManager.h"
-#import "TDScope.h"
 #import "KTBaseRequest+Private.h"
 
 static dispatch_once_t onceToken;

@@ -6,7 +6,6 @@
 //
 
 #import "KTNetworkTaskDelegate.h"
-#import "TDScope.h"
 
 @interface KTNetworkBaseDownloadTaskDelegate()
 @property (nonatomic, weak, readwrite) __kindof KTBaseDownloadRequest *request;
@@ -61,17 +60,17 @@
             _resumeDataLength = resumeData.length;
         }
         NSURLSessionTask *task = request.requestTask;
-        @weakify(task);
+		__weak typeof(task) weakTask = task;
         _progress.totalUnitCount = NSURLSessionTransferSizeUnknown;
         _progress.cancellable = YES;
         _progress.cancellationHandler = ^{
-            @strongify(task);
-            [task cancel];
+			__strong typeof(weakTask) strongTask = weakTask;
+            [strongTask cancel];
         };
         _progress.pausable = YES;
         _progress.pausingHandler = ^{
-            @strongify(task);
-            [task suspend];
+			__strong typeof(weakTask) strongTask = weakTask;
+            [strongTask suspend];
         };
 #if AF_CAN_USE_AT_AVAILABLE
         if (@available(iOS 9, macOS 10.11, *))
@@ -80,8 +79,8 @@
 #endif
         {
             _progress.resumingHandler = ^{
-                @strongify(task);
-                [task resume];
+				__strong typeof(weakTask) strongTask = weakTask;
+                [strongTask resume];
             };
         }
         
@@ -201,17 +200,18 @@ didCompleteWithError:(NSError *)error
             _resumeData = resumeData;
         }
         NSURLSessionTask *task = request.requestTask;
-        @weakify(task);
+		
+		__weak typeof(task) weakTask = task;
         _progress.totalUnitCount = NSURLSessionTransferSizeUnknown;
         _progress.cancellable = YES;
         _progress.cancellationHandler = ^{
-            @strongify(task);
-            [task cancel];
+			__strong typeof(weakTask) strongTask = weakTask;
+			[strongTask cancel];
         };
         _progress.pausable = YES;
         _progress.pausingHandler = ^{
-            @strongify(task);
-            [task suspend];
+			__strong typeof(weakTask) strongTask = weakTask;
+            [strongTask suspend];
         };
 #if AF_CAN_USE_AT_AVAILABLE
         if (@available(iOS 9, macOS 10.11, *))
@@ -220,8 +220,8 @@ didCompleteWithError:(NSError *)error
 #endif
         {
             _progress.resumingHandler = ^{
-                @strongify(task);
-                [task resume];
+				__strong typeof(weakTask) strongTask = weakTask;
+                [strongTask resume];
             };
         }
         

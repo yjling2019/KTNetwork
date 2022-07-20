@@ -7,7 +7,6 @@
 
 #import "KTBatchRequest.h"
 #import "KTNetworkAgent.h"
-#import "TDScope.h"
 #import "KTBaseRequest+Private.h"
 #import "KTGroupRequest+Private.h"
 #import "KTChainRequest.h"
